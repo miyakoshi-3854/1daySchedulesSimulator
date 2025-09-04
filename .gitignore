@@ -1,0 +1,9 @@
+# Composer
+/vendor/
+/composer.phar
+
+# FuelPHP
+/fuel/app/cache/*
+/fuel/app/logs/*
+/fuel/app/tmp/*
+!*/.gitkeep
