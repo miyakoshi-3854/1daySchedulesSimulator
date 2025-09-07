@@ -43,8 +43,8 @@ RUN DEFAULT_SITE_FILE=/etc/apache2/sites-enabled/000-default.conf && \
     mv $TMP $DEFAULT_SITE_FILE
 
 # FuelPHPのログディレクトリとキャッシュディレクトリを作成し、権限を設定
-RUN mkdir /var/log/fuel /var/cache/fuel && \
-    chmod 777 /var/log/fuel /var/cache/fuel
+RUN mkdir -p /var/www/html/fuel/app/logs /var/www/html/fuel/app/cache && \
+    chmod -R 777 /var/www/html/fuel/app/logs /var/www/html/fuel/app/cache
 
 # Composerをインストール
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
