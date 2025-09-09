@@ -1,7 +1,7 @@
 FROM php:7.3-apache
 
 # php.iniをコピー
-COPY ./docker/php.ini /usr/local/etc/php/
+COPY ./php.ini /usr/local/etc/php/
 
 # 必要なパッケージと拡張機能をインストール
 RUN apt-get update && \
@@ -51,8 +51,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 ENV COMPOSER_ALLOW_SUPERUSER 1
 
 # Oilをインストール
-RUN mkdir /var/www/html/my_fuel_project && \
-    cd /var/www/html/my_fuel_project && \
+RUN cd /var/www/html && \
     curl https://get.fuelphp.com/oil | sh
 
 EXPOSE 80
