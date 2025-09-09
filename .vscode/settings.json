@@ -1,0 +1,46 @@
+{
+  // -------------------- 基本エディタ設定 --------------------
+  // インデントを半角スペース2つに設定します。
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  // フォーマッターが見つからない場合のデフォルトとしてPrettierを指定します。
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  // ファイル保存時に自動でフォーマットを実行します。
+  "editor.formatOnSave": true,
+
+  // -------------------- ファイルタイプ別設定 --------------------
+  // PHPファイルにはPHP Formatterを適用します。
+  "[php]": {
+    "editor.defaultFormatter": "kokororin.vscode-phpfmt"
+  },
+  // HTML、CSS、JavaScriptファイルにはPrettierを適用します。
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // -------------------- 拡張機能設定 --------------------
+  // PHP Intelephenseの設定。DockerfileのPHPバージョンに合わせます。
+  "intelephense.environment.phpVersion": "7.3.33",
+
+  // -------------------- phpfmt 設定 --------------------
+  "phpfmt.indent_with_space": 2, // PHPもスペース2つで統一
+  "phpfmt.psr2": true, // PSR-2規約に準拠
+  "phpfmt.enable_auto_align": true, // = や => を揃える
+  "phpfmt.detect_indent": true, // 既存のインデントを検出
+
+  // Prettierの設定。フロントエンドのフォーマットルールを定義します。
+  "prettier.tabWidth": 2,
+  "prettier.useTabs": false,
+  "prettier.jsxSingleQuote": false,
+  "prettier.semi": true,
+  "prettier.singleQuote": true,
+  "prettier.bracketSpacing": true,
+  "prettier.arrowParens": "always",
+  "prettier.printWidth": 80
+}
