@@ -1,5 +1,5 @@
 # nodeの公式イメージを使用
-FROM node:18-alpine
+FROM node:latest
 
 # コンテナ内の作業ディレクトリを設定
 WORKDIR /usr/src/app
