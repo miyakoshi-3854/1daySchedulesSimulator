@@ -13,6 +13,16 @@ class Model_User extends \Orm\Model
 		'updated_at',
 	);
 
+	// schedulesテーブルとのhas_manyリレーションシップを定義
+	protected static $_has_many = array(
+		'schedules' => array(
+			'key_from' => 'id',
+			'model_to' => 'Model_Schedule',
+			'key_to' => 'user_id',
+			'cascade_delete' => true,
+		)
+	);
+
 	// 作成日時と更新日時のオブザーバー
 	protected static $_observers = array(
 		'Orm\Observer_CreatedAt' => array(
