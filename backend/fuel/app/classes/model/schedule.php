@@ -9,17 +9,6 @@ class Model_Schedule extends \Orm\Model
 	 * @var array $_properties
 	 * このモデルが扱うデータベースの**カラム（列）**を定義します。
 	 * ここで定義されたプロパティが、テーブルの各カラムに対応します。
-	 * * id:            // スケジュールのユニークな識別子（主キー）
-	 * user_id:       // スケジュールを作成したユーザーのID（外部キー）
-	 * category_id:   // スケジュールのカテゴリーID（外部キー）
-	 * title:         // スケジュールのタイトル
-	 * date:          // スケジュールの日付
-	 * start_time:    // スケジュールの開始時間
-	 * end_time:      // スケジュールの終了時間
-	 * color:         // スケジュールの表示色
-	 * note:          // スケジュールの詳細なメモ
-	 * created_at:    // レコードが作成された日時
-	 * updated_at:    // レコードが最後に更新された日時
 	 */
 	protected static $_properties = array(
 		'id',
