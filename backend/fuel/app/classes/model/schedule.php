@@ -18,6 +18,17 @@ class Model_Schedule extends \Orm\Model
 		'updated_at',
 	);
 
+	// Model_User(親)に属するModel_Schedule(子)のリレーションシップ
+	protected static $_belongs_to = array(
+    'user' => array(
+			'key_from' => 'user_id',
+			'model_to' => 'Model_User',
+			'key_to' => 'id',
+			'cascade_save' => true,
+			'cascade_delete' => false,
+    )
+	);
+
 	// 作成日時と更新日時のオブザーバー
 	protected static $_observers = array(
 		'Orm\Observer_CreatedAt' => array(
