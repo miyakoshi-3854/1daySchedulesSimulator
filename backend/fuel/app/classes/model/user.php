@@ -10,12 +10,52 @@ class Model_User extends \Orm\Model
 	 * ここで定義されたプロパティが、テーブルの各カラムに対応します。
 	 */
 	protected static $_properties = array(
-		'id',
-		'name',
-		'email',
-		'password',
-		'created_at',
-		'updated_at',
+		'id' => array(
+			'data_type' => 'int',
+			'null' => false,
+			'auto_increment' => true,
+			'primary_key' => true,
+			'label' => 'ID',
+		),
+		'name' => array(
+			'data_type' => 'varchar',
+			'null' => false,
+			'label' => 'ユーザー名',
+			'validation' => array(
+				'required' => true,
+				'min_length' => 2,
+				'max_length' => 50,
+			),
+		),
+		'email' => array(
+			'data_type' => 'varchar',
+			'null' => true,
+			'unique' => true,
+			'label' => 'メールアドレス',
+			'validation' => array(
+				'required' => false,
+				'valid_email' => true,
+			),
+		),
+		'password' => array(
+			'data_type' => 'varchar',
+			'null' => false,
+			'label' => 'パスワード',
+			'validation' => array(
+				'required' => true,
+				'min_length' => 8,
+			),
+		),
+		'created_at' => array(
+			'data_type' => 'datetime',
+			'null' => false,
+			'label' => '作成日時',
+		),
+		'updated_at' => array(
+			'data_type' => 'datetime',
+			'null' => false,
+			'label' => '更新日時',
+		),
 	);
 
 	/**
