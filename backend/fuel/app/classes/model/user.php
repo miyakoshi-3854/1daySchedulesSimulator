@@ -79,6 +79,10 @@ class Model_User extends \Orm\Model
 	 * データベース操作の前後に自動で実行される処理（**オブザーバー**）を定義します。
 	 */
 	protected static $_observers = array(
+		// `before_save` イベント時にバリデーション（入力値検証）を行うオブザーバー。
+		'Orm\Observer_Validation' => array(
+			'events' => array('before_save'), 
+		),
 		// 新規レコード作成時、`created_at`カラムにタイムスタンプを自動設定するオブザーバー。
 		'Orm\Observer_CreatedAt' => array(
 			'events' => array('before_insert'),
