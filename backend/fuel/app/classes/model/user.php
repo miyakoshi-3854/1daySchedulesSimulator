@@ -22,9 +22,9 @@ class Model_User extends \Orm\Model
 			'null' => false,
 			'label' => 'ユーザー名',
 			'validation' => array(
-				'required' => true,
-				'min_length' => 2,
-				'max_length' => 50,
+				'required',
+				'min_length' => array(2),
+				'max_length' => array(50),
 			),
 		),
 		'email' => array(
@@ -33,8 +33,7 @@ class Model_User extends \Orm\Model
 			'unique' => true,
 			'label' => 'メールアドレス',
 			'validation' => array(
-				'required' => false,
-				'valid_email' => true,
+				'valid_email',
 			),
 		),
 		'password' => array(
@@ -42,8 +41,8 @@ class Model_User extends \Orm\Model
 			'null' => false,
 			'label' => 'パスワード',
 			'validation' => array(
-				'required' => true,
-				'min_length' => 8,
+				'required',
+				'min_length' => array(8),
 			),
 		),
 		'created_at' => array(
