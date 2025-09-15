@@ -67,7 +67,7 @@ class Model_Schedule extends \Orm\Model
 		),
 		'color' => array(
 			'data_type' => 'varchar',
-			'null' => true,
+			'null' => false,
 			'label' => '色',
 			'validation' => array(
 				'exact_length' => array(7),
