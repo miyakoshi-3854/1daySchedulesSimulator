@@ -14,7 +14,7 @@ class Create_schedules
 			'date' => array('type' => 'datetime'),
 			'start_time' => array('type' => 'time'),
 			'end_time' => array('type' => 'time'),
-			'color' => array('constraint' => 7, 'type' => 'varchar', 'null' => true),
+			'color' => array('constraint' => 7, 'type' => 'varchar'),
 			'note' => array('type' => 'text', 'null' => true),
 			'created_at' => array('type' => 'datetime', 'default' => \DB::expr('CURRENT_TIMESTAMP')),
 			'updated_at' => array('type' => 'datetime', 'default' => \DB::expr('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP')),
