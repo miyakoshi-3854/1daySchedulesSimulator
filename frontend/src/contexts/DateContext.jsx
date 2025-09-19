@@ -74,7 +74,7 @@ export const DateProvider = ({ children }) => {
   };
 
   // Providerコンポーネントの役割は、valueオブジェクトを子コンポーネントに渡すことです。
-  return <DateContext.Provider value={value}>{children}</DateContext.Provider>;
+  return <DateContext value={value}>{children}</DateContext>;
 };
 
 /*
