@@ -6,4 +6,5 @@
 /fuel/app/cache/*
 /fuel/app/logs/*
 /fuel/app/tmp/*
+/fuel/app/config/crypt.php
 !*/.gitkeep
