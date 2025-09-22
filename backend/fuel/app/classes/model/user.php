@@ -2,7 +2,7 @@
 
 // `users` テーブルに対応するモデルクラス
 // このクラスは、データベースの `users` テーブルとやり取りするためのモデル（設計図）です。
-class Model_User extends \Orm\Model
+class Model_User extends \Auth\Model\Auth_User
 {
 	/**
 	 * @var array $_properties
@@ -10,51 +10,14 @@ class Model_User extends \Orm\Model
 	 * ここで定義されたプロパティが、テーブルの各カラムに対応します。
 	 */
 	protected static $_properties = array(
-		'id' => array(
-			'data_type' => 'int',
-			'null' => false,
-			'auto_increment' => true,
-			'primary_key' => true,
-			'label' => 'ID',
-		),
-		'name' => array(
-			'data_type' => 'varchar',
-			'null' => false,
-			'label' => 'ユーザー名',
-			'validation' => array(
-				'required',
-				'min_length' => array(2),
-				'max_length' => array(50),
-			),
-		),
-		'email' => array(
-			'data_type' => 'varchar',
-			'null' => true,
-			'unique' => true,
-			'label' => 'メールアドレス',
-			'validation' => array(
-				'valid_email',
-			),
-		),
-		'password' => array(
-			'data_type' => 'varchar',
-			'null' => false,
-			'label' => 'パスワード',
-			'validation' => array(
-				'required',
-				'min_length' => array(8),
-			),
-		),
-		'created_at' => array(
-			'data_type' => 'datetime',
-			'null' => false,
-			'label' => '作成日時',
-		),
-		'updated_at' => array(
-			'data_type' => 'datetime',
-			'null' => false,
-			'label' => '更新日時',
-		),
+		'id',
+		'username',
+		'password',
+		'email',
+		'group',
+		'last_login',
+		'login_hash',
+		'profile_fields',
 	);
 
 	/**
@@ -81,16 +44,6 @@ class Model_User extends \Orm\Model
 		// `before_save` イベント時にバリデーション（入力値検証）を行うオブザーバー。
 		'Orm\Observer_Validation' => array(
 			'events' => array('before_save'), 
-		),
-		// 新規レコード作成時、`created_at`カラムにタイムスタンプを自動設定するオブザーバー。
-		'Orm\Observer_CreatedAt' => array(
-			'events' => array('before_insert'),
-			'mysql_timestamp' => true,
-		),
-		// レコードが更新されるたび、`updated_at`カラムにタイムスタンプを自動設定するオブザーバー。
-		'Orm\Observer_UpdatedAt' => array(
-			'events' => array('before_save'),	
-			'mysql_timestamp' => true,
 		),
 	);
 
