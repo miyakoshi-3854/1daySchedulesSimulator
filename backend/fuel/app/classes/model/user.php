@@ -25,16 +25,25 @@ class Model_User extends \Auth\Model\Auth_User
 	 * 他のモデルとの**リレーションシップ（関連付け）**を定義します。
 	 * これにより、関連するテーブルのデータを簡単に取得できるようになります。
 	 */
-	protected static $_has_many = array(
-		// Model_User(親)に属するModel_Schedule(子)の一対多のリレーションシップ
-		// 1人のユーザーは複数のスケジュールを持つことができます。
-		'schedules' => array(
-			'key_from' => 'id',
-			'model_to' => 'Model_Schedule',
-			'key_to' => 'user_id',
-			'cascade_delete' => true,
-		)
-	);
+	/**
+	 * Auth_User の初期化にリレーションを追加
+	 */
+	public static function _init()
+	{
+		// Auth_User 側の初期化
+		parent::_init();
+
+		// schedules リレーションを追加
+		static::$_has_many = array_merge(static::$_has_many, array(
+			'schedules' => array(
+				'key_from'       => 'id',              // users.id
+				'model_to'       => 'Model_Schedule',  // 対象モデル
+				'key_to'         => 'user_id',         // schedules.user_id
+				'cascade_save'   => true,
+				'cascade_delete' => true,
+			),
+		));
+	}	
 
 	/**
 	 * @var array $_observers

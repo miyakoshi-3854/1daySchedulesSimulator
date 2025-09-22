@@ -6,9 +6,8 @@ return array(
     array(
       'default' => 
       array(
-        0 => '001_create_users',
-        1 => '002_create_categories',
-        2 => '003_create_schedules',
+        0 => '001_create_categories',
+        1 => '002_create_schedules',
       ),
     ),
     'module' => 
