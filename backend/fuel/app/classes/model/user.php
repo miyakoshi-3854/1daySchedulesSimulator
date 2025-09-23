@@ -2,7 +2,7 @@
 
 // `users` テーブルに対応するモデルクラス
 // このクラスは、データベースの `users` テーブルとやり取りするためのモデル（設計図）です。
-class Model_User extends \Auth\Model\Auth_User
+class Model_User extends \Orm\Model
 {
 	/**
 	 * @var array $_properties
@@ -10,14 +10,73 @@ class Model_User extends \Auth\Model\Auth_User
 	 * ここで定義されたプロパティが、テーブルの各カラムに対応します。
 	 */
 	protected static $_properties = array(
-		'id',
-		'username',
-		'password',
-		'email',
-		'group',
-		'last_login',
-		'login_hash',
-		'profile_fields',
+		'id' => array(
+			'data_type' => 'int',
+			'null' => false,
+			'auto_increment' => true,
+			'primary_key' => true,
+			'label' => 'ID',
+		),
+		'username' => array(
+			'data_type' => 'varchar',
+			'null' => false,
+			'label' => 'ユーザー名',
+			'validation' => array(
+				'required',
+				'max_length' => array(50)
+			),
+		),
+		'password' => array(
+			'data_type' => 'varchar',
+			'null' => false,
+			'label' => 'Password',
+			'validation' => array(
+				'required',
+				'max_length' => array(255)
+			),
+		),
+		'email' => array(
+			'data_type' => 'varchar',
+			'null' => false,
+			'label' => 'Email',
+			'validation' => array(
+				'required',
+				'valid_email',
+				'max_length' => array(255)
+			),
+		),
+		'group' => array(
+			'data_type' => 'int',
+			'null' => false,
+			'default' => 1,
+		),
+		'last_login' => array(
+			'data_type' => 'varchar',
+			'null' => false,
+			'default' => '',
+		),
+		'login_hash' => array(
+			'data_type' => 'varchar',
+			'null' => false,
+			'default' => '',
+		),
+		'profile_fields' => array(
+			'data_type' => 'text',
+			'null' => false,
+			'label' => 'Profile Fields',
+		),
+		'created_at' => array(
+			'data_type' => 'int',
+			'null' => false,
+			'default' => 0,
+			'label' => '作成日時',
+		),
+		'updated_at' => array(
+			'data_type' => 'int',
+			'null' => false,
+			'default' => 0,
+			'label' => '更新日時',
+		),
 	);
 
 	/**
@@ -25,25 +84,15 @@ class Model_User extends \Auth\Model\Auth_User
 	 * 他のモデルとの**リレーションシップ（関連付け）**を定義します。
 	 * これにより、関連するテーブルのデータを簡単に取得できるようになります。
 	 */
-	/**
-	 * Auth_User の初期化にリレーションを追加
-	 */
-	public static function _init()
-	{
-		// Auth_User 側の初期化
-		parent::_init();
-
-		// schedules リレーションを追加
-		static::$_has_many = array_merge(static::$_has_many, array(
-			'schedules' => array(
-				'key_from'       => 'id',              // users.id
-				'model_to'       => 'Model_Schedule',  // 対象モデル
-				'key_to'         => 'user_id',         // schedules.user_id
-				'cascade_save'   => true,
-				'cascade_delete' => true,
-			),
-		));
-	}	
+	protected static $_has_many = array(
+		'schedules' => array(
+			'key_from'       => 'id',            // users.id
+			'model_to'       => 'Model_Schedule',// 対象モデル
+			'key_to'         => 'user_id',       // schedules.user_id
+			'cascade_save'   => true,
+			'cascade_delete' => true,
+		),
+	);	
 
 	/**
 	 * @var array $_observers
@@ -53,6 +102,16 @@ class Model_User extends \Auth\Model\Auth_User
 		// `before_save` イベント時にバリデーション（入力値検証）を行うオブザーバー。
 		'Orm\Observer_Validation' => array(
 			'events' => array('before_save'), 
+		),
+		// 新規レコード作成時、`created_at`カラムにタイムスタンプを自動設定するオブザーバー。
+		'Orm\Observer_CreatedAt' => array(
+			'events' => array('before_insert'),
+			'mysql_timestamp' => false, // カラムの型がint型のためfalse
+		),
+		// レコードが更新されるたび、`updated_at`カラムにタイムスタンプを自動設定するオブザーバー。
+		'Orm\Observer_UpdatedAt' => array(
+			'events' => array('before_save'),
+			'mysql_timestamp' => false, // カラムの型がint型のためfalse
 		),
 	);
 
