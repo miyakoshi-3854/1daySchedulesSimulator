@@ -13,7 +13,8 @@ class Controller_Base_Api extends Controller_Rest
     parent::before();
 
     // CORS ヘッダ設定
-    header('Access-Control-Allow-Origin: *');
+    header('Access-Control-Allow-Origin: http://localhost:5173'); // React のオリジン
+    header('Access-Control-Allow-Credentials: true');             // Cookie 送信を許可
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
