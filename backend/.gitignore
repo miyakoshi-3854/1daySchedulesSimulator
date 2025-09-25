@@ -8,3 +8,4 @@
 /fuel/app/tmp/*
 /fuel/app/config/crypt.php
 !*/.gitkeep
+cookies.txt
