@@ -113,7 +113,10 @@ class Controller_Api_User extends Controller_Rest
    */
   public function post_logout()
   {
-    // ログアウト済みの場合
+    // remember-me の自動ログイン用クッキーを無効化
+    \Auth::dont_remember_me();
+
+    // 未ログインの場合
     if (!\Auth::check()) {
       return $this->response([
         'status' => 'error',
@@ -121,14 +124,52 @@ class Controller_Api_User extends Controller_Rest
       ], 400);
     }
 
+    // クライアント側にクッキー破棄を明示的に送信
+    \Cookie::delete('fuelcid', '/'); // セッションIDクッキー
+    \Cookie::delete('remember_me', '/'); // 自動ログインクッキー
+
     // ログアウト処理
     \Auth::logout(); // ユーザーの認証状態を解除
+    
+    // セッション破棄（最後に）
     \Session::destroy(); // セッションを完全に破棄
 
     // ログアウト成功時のレスポンスを返す
     return $this->response([
       'status' => 'success',
       'message' => 'Logged out successfully',
+    ], 200);
+  }
+
+  /**
+   * GET /api/me
+   * ログイン中のユーザー情報を取得
+   */
+  public function get_me()
+  {
+    // ユーザーがログイン済みかどうかを確認
+    if (\Auth::check()) {
+      // ログイン済みの場合、ユーザー情報を取得
+      $user_id  = \Auth::get_user_id()[1]; // [driver, id]形式の [1] が user_id
+      $username = \Auth::get_screen_name();
+
+      // ログイン成功時のレスポンスを返す
+      return $this->response([
+        'status' => 'success',
+        'data' => [
+          'user_id' => $user_id,
+          'username' => $username,
+          'logged_in' => true,
+        ]
+      ], 200);
+    }
+
+    // 未ログインの場合のレスポンス
+    return $this->response([
+      'status' => 'success',
+      'data' => [
+        'logged_in' => false,
+      ]
     ], 200);
   }
 }
