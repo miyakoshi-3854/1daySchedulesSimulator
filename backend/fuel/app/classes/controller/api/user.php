@@ -106,4 +106,29 @@ class Controller_Api_User extends Controller_Rest
       'message' => 'Invalid email or password',
     ], 401);
   }
+
+  /**
+   * POST /api/logout
+   * ユーザーログアウト処理
+   */
+  public function post_logout()
+  {
+    // ログアウト済みの場合
+    if (!\Auth::check()) {
+      return $this->response([
+        'status' => 'error',
+        'message' => 'No active session',
+      ], 400);
+    }
+
+    // ログアウト処理
+    \Auth::logout(); // ユーザーの認証状態を解除
+    \Session::destroy(); // セッションを完全に破棄
+
+    // ログアウト成功時のレスポンスを返す
+    return $this->response([
+      'status' => 'success',
+      'message' => 'Logged out successfully',
+    ], 200);
+  }
 }
