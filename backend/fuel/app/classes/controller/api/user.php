@@ -4,12 +4,14 @@ use Fuel\Core\Controller_Rest;
 use Fuel\Core\Input;
 use Fuel\Core\Validation;
 use Fuel\Core\Auth;
+use Fuel\Core\Session;
 
 class Controller_Api_User extends Controller_Rest
 {
   protected $format = 'json';
 
   /**
+   * POST /api/register
    * POSTリクエストによるユーザー登録処理
    */
   public function post_register()
@@ -55,5 +57,53 @@ class Controller_Api_User extends Controller_Rest
         'message' => $e->getMessage(),
       ], 400);
     }
+  }
+
+  /**
+   * POST /api/login
+   * POSTリクエストによるユーザーログイン処理
+   */
+  public function post_login()
+  {
+    // 入力チェック
+    $val = Validation::forge();
+    $val->add('email', 'Email')->add_rule('required')->add_rule('valid_email');
+    $val->add('password', 'Password')->add_rule('required');
+
+    // バリデーションを実行し、失敗した場合はエラーレスポンスを返す
+    if (!$val->run()) {
+      return $this->response([
+        'status' => 'error',
+        'errors' => $val->error_message(),
+      ], 400);
+    }
+
+    // POSTデータからメールアドレスとパスワードを取得
+    $email    = Input::post('email');
+    $password = Input::post('password');
+
+    // FuelPHPの認証機能を使ってユーザーをログイン認証
+    // 成功した場合はtrueを返す
+    if (\Auth::login($email, $password)) {
+      $user_id = \Auth::get_user_id()[1]; // [driver, id] 形式なので [1] が user_id
+      $username = \Auth::get_screen_name();
+
+      // セッション開始済みのため、ログイン成功レスポンスを返す
+      return $this->response([
+        'status' => 'success',
+        'data'   => [
+          'user_id'  => $user_id,
+          'username' => $username,
+          'email'    => $email,
+          'session_id' => \Session::key(), // 現在のセッションIDを返す
+        ]
+      ], 200);
+    }
+
+    // 認証失敗時
+    return $this->response([
+      'status' => 'error',
+      'message' => 'Invalid email or password',
+    ], 401);
   }
 }
