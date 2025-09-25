@@ -4,6 +4,7 @@ return array(
 	'_404_'   => 'welcome/404',    // The main 404 route
 
 	'api/register' => 'api/user/register', // ユーザー登録API
+	'api/login'    => 'api/user/login', // ユーザーログインAPI
 	
 	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 );
