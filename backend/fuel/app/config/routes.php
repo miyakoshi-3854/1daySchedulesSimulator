@@ -3,10 +3,14 @@ return array(
 	'_root_'  => 'welcome/index',  // The default route
 	'_404_'   => 'welcome/404',    // The main 404 route
 
+	// User関連
 	'api/register' => 'api/user/register', // ユーザー登録API
 	'api/login'    => 'api/user/login', // ユーザーログインAPI
 	'api/logout'   => 'api/user/logout', // ユーザーログアウトAPI
 	'api/me'       => 'api/user/me', // ユーザーログイン状態確認API
+
+	// Schedule関連
+	'api/schedules' => 'api/schedule/index', // スケージュール一覧取得API
 	
 	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 );
