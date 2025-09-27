@@ -1,12 +1,11 @@
 <?php
 
-use Fuel\Core\Controller_Rest;
 use Fuel\Core\Input;
-use Fuel\Core\Auth;
 
-class Controller_Api_Schedule extends Controller_Rest
+class Controller_Api_Schedule extends Controller_Base_Api
 {
-  protected $format = 'json';
+  // 全メソッドで認証が必要
+  protected $require_auth = true;
 
   /**
    * GET /api/schedules
@@ -14,54 +13,26 @@ class Controller_Api_Schedule extends Controller_Rest
    */
   public function get_index()
   {
-    // ログインチェック
-    if (!\Auth::check()) {
-      return $this->response([
-        'status' => 'error',
-        'message' => 'Unauthorized',
-      ], 401);
+    // 認証は before() で完了しているため、ここでは不要
+    $user_id = $this->get_current_user_id();
+    $date = Input::get('date');
+    $start_date = Input::get('start_date'); // 期間指定に対応
+    $end_date = Input::get('end_date');     // 期間指定に対応
+
+    // パラメータバリデーション (date or (start_date and end_date))
+    if (!$date && !($start_date && $end_date)) {
+        return $this->error('Missing required parameter: date or (start_date and end_date)', 400);
     }
+    
+    // Model のメソッドを呼び出す (Model_Schedule の完全版が必要です)
+    $schedules = Model_Schedule::get_user_schedules(
+        $user_id,
+        $date,
+        $start_date,
+        $end_date
+    );
 
-    // ログイン中のユーザーID
-    $user_id = \Auth::get_user_id()[1];
-
-    // クエリパラメータから date を取得
-    $date = \Input::get('date');
-
-    if (!$date) {
-      return $this->response([
-        'status' => 'error',
-        'message' => 'Missing required parameter: date',
-      ], 400);
-    }
-
-    // ORM を使ってスケジュールを取得
-    $schedules = Model_Schedule::find('all', [
-      'where' => [
-        ['user_id', $user_id],
-        ['date', $date],
-      ],
-      'order_by' => ['start_time' => 'asc'],
-    ]);
-
-    // 結果を配列化
-    $result = [];
-    foreach ($schedules as $schedule) {
-      $result[] = [
-        'id'         => $schedule->id,
-        'title'      => $schedule->title,
-        'date'       => $schedule->date,
-        'start_time' => $schedule->start_time,
-        'end_time'   => $schedule->end_time,
-        'color'      => $schedule->color,
-        'note'       => $schedule->note,
-        'category_id'=> $schedule->category_id,
-      ];
-    }
-
-    return $this->response([
-      'status' => 'success',
-      'data'   => $result,
-    ], 200);
+    // 共通メソッドでレスポンス
+    return $this->success($schedules);
   }
 }

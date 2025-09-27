@@ -1,11 +1,12 @@
 <?php
 
-use Fuel\Core\Controller_Rest;
 use Fuel\Core\Input;
 use Fuel\Core\Validation;
 
-class Controller_Api_User extends Controller_Rest
+class Controller_Api_User extends Controller_Base_Api
 {
+   // 自動認証はオフ（メソッドごとに手動制御）
+  protected $require_auth = false;
   protected $format = 'json';
 
   /**
@@ -13,14 +14,12 @@ class Controller_Api_User extends Controller_Rest
    * ユーザー登録処理
    */
   public function post_register()
-{
-    // バリデーション処理
+  {
     $validation = $this->validate_registration();
     if ($validation !== true) {
-      return $validation; // エラーレスポンス
+      return $validation; 
     }
 
-    // Modelでビジネスロジック実行
     try {
       $user_data = Model_User::create_new_user(
         Input::post('username'),
@@ -28,16 +27,10 @@ class Controller_Api_User extends Controller_Rest
         Input::post('password')
       );
 
-      return $this->response([
-        'status' => 'success',
-        'data'   => $user_data
-      ], 201);
+      return $this->success($user_data, 201); // 共通 success を使用
 
     } catch (\SimpleUserUpdateException $e) {
-      return $this->response([
-        'status'  => 'error',
-        'message' => $e->getMessage(),
-      ], 400);
+      return $this->error($e->getMessage(), 400); // 共通 error を使用
     }
   }
 
@@ -47,32 +40,22 @@ class Controller_Api_User extends Controller_Rest
    */
   public function post_login()
   {
-    // バリデーション処理
     $validation = $this->validate_login();
     if ($validation !== true) {
-      return $validation; // エラーレスポンス
+      return $validation; 
     }
 
-    // Modelで認証処理
     $user_data = Model_User::authenticate_user(
       Input::post('email'),
       Input::post('password')
     );
 
     if ($user_data === false) {
-      return $this->response([
-        'status'  => 'error',
-        'message' => 'Invalid email or password',
-      ], 401);
+      return $this->error('Invalid email or password', 401); // 共通 error を使用
     }
 
-    // ログイン成功レスポンス（セッションIDを追加）
     $user_data['session_id'] = Model_User::get_session_id();
-    
-    return $this->response([
-      'status' => 'success',
-      'data'   => $user_data
-    ], 200);
+    return $this->success($user_data); // 共通 success を使用
   }
 
   /**
@@ -81,18 +64,12 @@ class Controller_Api_User extends Controller_Rest
    */
   public function post_logout()
   {
-    // Modelでログアウト処理
+    // 認証チェックは Model 側に寄せているため、Model の戻り値で判定
     if (!Model_User::logout_user()) {
-      return $this->response([
-        'status'  => 'error',
-        'message' => 'No active session',
-      ], 400);
+      return $this->error('No active session', 400); // 共通 error を使用
     }
 
-    return $this->response([
-      'status'  => 'success',
-      'message' => 'Logged out successfully',
-    ], 200);
+    return $this->success(['message' => 'Logged out successfully']); // 共通 success を使用
   }
 
   /**
@@ -101,22 +78,15 @@ class Controller_Api_User extends Controller_Rest
    */
   public function get_me()
   {
-    // Modelからユーザー情報を取得
+    // 認証が必要だが、BaseControllerでは認証がスキップされているため、Model側で認証状態を確認
     $user_data = Model_User::get_current_user_info();
     
     if ($user_data === null) {
-      return $this->response([
-        'status' => 'success',
-        'data'   => ['logged_in' => false]
-      ], 200);
+      return $this->success(['logged_in' => false]);
     }
 
     $user_data['logged_in'] = true;
-    
-    return $this->response([
-      'status' => 'success',
-      'data'   => $user_data
-    ], 200);
+    return $this->success($user_data); // 共通 success を使用
   }
 
   // ======================================================================
@@ -135,10 +105,8 @@ class Controller_Api_User extends Controller_Rest
     $val->add('password', 'Password')->add_rule('required')->add_rule('min_length', 6);
 
     if (!$val->run()) {
-      return $this->response([
-        'status' => 'error',
-        'errors' => $val->error_message(),
-      ], 400);
+      // 共通 validation_error を使用
+      return $this->validation_error($val->error_message());
     }
 
     return true;
@@ -155,10 +123,8 @@ class Controller_Api_User extends Controller_Rest
     $val->add('password', 'Password')->add_rule('required');
 
     if (!$val->run()) {
-      return $this->response([
-        'status' => 'error',
-        'errors' => $val->error_message(),
-      ], 400);
+      // 共通 validation_error を使用
+      return $this->validation_error($val->error_message());
     }
 
     return true;
