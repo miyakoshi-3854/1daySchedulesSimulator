@@ -3,8 +3,6 @@
 use Fuel\Core\Controller_Rest;
 use Fuel\Core\Input;
 use Fuel\Core\Validation;
-use Fuel\Core\Auth;
-use Fuel\Core\Session;
 
 class Controller_Api_User extends Controller_Rest
 {
@@ -12,46 +10,30 @@ class Controller_Api_User extends Controller_Rest
 
   /**
    * POST /api/register
-   * POSTリクエストによるユーザー登録処理
+   * ユーザー登録処理
    */
   public function post_register()
-  {
-    // 入力チェック
-    $val = Validation::forge();
-    $val->add('username', 'Username')->add_rule('required');
-    $val->add('email', 'Email')->add_rule('required')->add_rule('valid_email');
-    $val->add('password', 'Password')->add_rule('required')->add_rule('min_length', 6);
-
-    // バリデーションを実行し、失敗した場合はエラーレスポンスを返す
-    if (!$val->run()) {
-      return $this->response([
-        'status' => 'error',
-        'errors' => $val->error_message(),
-      ], 400);
+{
+    // バリデーション処理
+    $validation = $this->validate_registration();
+    if ($validation !== true) {
+      return $validation; // エラーレスポンス
     }
 
-    // POSTデータからユーザー情報を取得
-    $username = Input::post('username');
-    $email    = Input::post('email');
-    $password = Input::post('password');
-
+    // Modelでビジネスロジック実行
     try {
-      // FuelPHPの認証機能を使って新しいユーザーを作成
-      // パスワードは自動的にハッシュ化されて保存される
-      $user_id = \Auth::create_user($username, $password, $email);
+      $user_data = Model_User::create_new_user(
+        Input::post('username'),
+        Input::post('email'),
+        Input::post('password')
+      );
 
-      // ユーザー作成成功時のレスポンスを返す
       return $this->response([
         'status' => 'success',
-        'data'   => [
-          'user_id'  => $user_id,
-          'username' => $username,
-          'email'    => $email,
-        ]
+        'data'   => $user_data
       ], 201);
 
     } catch (\SimpleUserUpdateException $e) {
-      // ユーザー作成中にエラーが発生した場合
       return $this->response([
         'status'  => 'error',
         'message' => $e->getMessage(),
@@ -61,50 +43,36 @@ class Controller_Api_User extends Controller_Rest
 
   /**
    * POST /api/login
-   * POSTリクエストによるユーザーログイン処理
+   * ユーザーログイン処理
    */
   public function post_login()
   {
-    // 入力チェック
-    $val = Validation::forge();
-    $val->add('email', 'Email')->add_rule('required')->add_rule('valid_email');
-    $val->add('password', 'Password')->add_rule('required');
-
-    // バリデーションを実行し、失敗した場合はエラーレスポンスを返す
-    if (!$val->run()) {
-      return $this->response([
-        'status' => 'error',
-        'errors' => $val->error_message(),
-      ], 400);
+    // バリデーション処理
+    $validation = $this->validate_login();
+    if ($validation !== true) {
+      return $validation; // エラーレスポンス
     }
 
-    // POSTデータからメールアドレスとパスワードを取得
-    $email    = Input::post('email');
-    $password = Input::post('password');
+    // Modelで認証処理
+    $user_data = Model_User::authenticate_user(
+      Input::post('email'),
+      Input::post('password')
+    );
 
-    // FuelPHPの認証機能を使ってユーザーをログイン認証
-    // 成功した場合はtrueを返す
-    if (\Auth::login($email, $password)) {
-      $user_id = \Auth::get_user_id()[1]; // [driver, id] 形式なので [1] が user_id
-      $username = \Auth::get_screen_name();
-
-      // セッション開始済みのため、ログイン成功レスポンスを返す
+    if ($user_data === false) {
       return $this->response([
-        'status' => 'success',
-        'data'   => [
-          'user_id'  => $user_id,
-          'username' => $username,
-          'email'    => $email,
-          'session_id' => \Session::key(), // 現在のセッションIDを返す
-        ]
-      ], 200);
+        'status'  => 'error',
+        'message' => 'Invalid email or password',
+      ], 401);
     }
 
-    // 認証失敗時
+    // ログイン成功レスポンス（セッションIDを追加）
+    $user_data['session_id'] = Model_User::get_session_id();
+    
     return $this->response([
-      'status' => 'error',
-      'message' => 'Invalid email or password',
-    ], 401);
+      'status' => 'success',
+      'data'   => $user_data
+    ], 200);
   }
 
   /**
@@ -113,63 +81,86 @@ class Controller_Api_User extends Controller_Rest
    */
   public function post_logout()
   {
-    // remember-me の自動ログイン用クッキーを無効化
-    \Auth::dont_remember_me();
-
-    // 未ログインの場合
-    if (!\Auth::check()) {
+    // Modelでログアウト処理
+    if (!Model_User::logout_user()) {
       return $this->response([
-        'status' => 'error',
+        'status'  => 'error',
         'message' => 'No active session',
       ], 400);
     }
 
-    // クライアント側にクッキー破棄を明示的に送信
-    \Cookie::delete('fuelcid', '/'); // セッションIDクッキー
-    \Cookie::delete('remember_me', '/'); // 自動ログインクッキー
-
-    // ログアウト処理
-    \Auth::logout(); // ユーザーの認証状態を解除
-    
-    // セッション破棄（最後に）
-    \Session::destroy(); // セッションを完全に破棄
-
-    // ログアウト成功時のレスポンスを返す
     return $this->response([
-      'status' => 'success',
+      'status'  => 'success',
       'message' => 'Logged out successfully',
     ], 200);
   }
 
   /**
    * GET /api/me
-   * ログイン中のユーザー情報を取得
+   * 現在のユーザー情報を取得
    */
   public function get_me()
   {
-    // ユーザーがログイン済みかどうかを確認
-    if (\Auth::check()) {
-      // ログイン済みの場合、ユーザー情報を取得
-      $user_id  = \Auth::get_user_id()[1]; // [driver, id]形式の [1] が user_id
-      $username = \Auth::get_screen_name();
-
-      // ログイン成功時のレスポンスを返す
+    // Modelからユーザー情報を取得
+    $user_data = Model_User::get_current_user_info();
+    
+    if ($user_data === null) {
       return $this->response([
         'status' => 'success',
-        'data' => [
-          'user_id' => $user_id,
-          'username' => $username,
-          'logged_in' => true,
-        ]
+        'data'   => ['logged_in' => false]
       ], 200);
     }
 
-    // 未ログインの場合のレスポンス
+    $user_data['logged_in'] = true;
+    
     return $this->response([
       'status' => 'success',
-      'data' => [
-        'logged_in' => false,
-      ]
+      'data'   => $user_data
     ], 200);
+  }
+
+  // ======================================================================
+  // Private Helper Methods (バリデーション処理)
+  // ======================================================================
+
+  /**
+   * ユーザー登録用バリデーション
+   * @return mixed true（成功）またはエラーレスポンス
+   */
+  private function validate_registration()
+  {
+    $val = Validation::forge();
+    $val->add('username', 'Username')->add_rule('required');
+    $val->add('email', 'Email')->add_rule('required')->add_rule('valid_email');
+    $val->add('password', 'Password')->add_rule('required')->add_rule('min_length', 6);
+
+    if (!$val->run()) {
+      return $this->response([
+        'status' => 'error',
+        'errors' => $val->error_message(),
+      ], 400);
+    }
+
+    return true;
+  }
+
+  /**
+   * ログイン用バリデーション
+   * @return mixed true（成功）またはエラーレスポンス
+   */
+  private function validate_login()
+{
+    $val = Validation::forge();
+    $val->add('email', 'Email')->add_rule('required')->add_rule('valid_email');
+    $val->add('password', 'Password')->add_rule('required');
+
+    if (!$val->run()) {
+      return $this->response([
+        'status' => 'error',
+        'errors' => $val->error_message(),
+      ], 400);
+    }
+
+    return true;
   }
 }
