@@ -2,11 +2,16 @@
 
 use Fuel\Core\Controller_Rest;
 use Fuel\Core\Response;
+use Fuel\Core\Input;
 
 class Controller_Base_Api extends Controller_Rest
 {
   // デフォルトのレスポンスフォーマット
   protected $format = 'json';
+
+  // 認証関連プロパティ
+  protected $require_auth = false; // 継承先でtrueにすることで認証必須
+  protected $user_id = null;       // 認証済みユーザーのID
 
   public function before()
   {
@@ -22,6 +27,45 @@ class Controller_Base_Api extends Controller_Rest
     if (\Input::method() === 'OPTIONS') {
       return Response::forge('', 200);
     }
+
+    // 認証チェック（継承クラスで true の場合のみ実行）
+    if ($this->require_auth) {
+      if (!$this->authenticate()) {
+        // 認証失敗時は authenticate() でレスポンスを返し、
+        // before()から false を返すことで、コントローラーのメイン処理実行を停止
+        return false; 
+      }
+    }
+  }
+
+  /**
+   * 認証処理（Auth::check()とユーザーIDの取得）
+   * @return bool 認証成功/失敗
+   */
+  protected function authenticate()
+  {
+    if (!\Auth::check()) {
+      $this->error('Unauthorized', 401);
+      return false;
+    }
+
+    $user_id_array = \Auth::get_user_id();
+    if (!$user_id_array || !isset($user_id_array[1])) {
+      $this->error('Failed to get user ID', 500);
+      return false;
+    }
+
+    $this->user_id = $user_id_array[1];
+    return true;
+  }
+
+  /**
+   * 現在のユーザーIDを取得 (Model連携用)
+   * @return int|null ユーザーID
+   */
+  protected function get_current_user_id()
+  {
+    return $this->user_id;
   }
 
   /**
@@ -43,6 +87,18 @@ class Controller_Base_Api extends Controller_Rest
     return $this->response([
       'status'  => 'error',
       'message' => $message,
+    ], $status);
+  }
+
+  /**
+   * バリデーションエラーレスポンス
+   */
+  protected function validation_error($errors, $status = 400)
+  {
+    // ユーザーコントローラーのバリデーションロジックに合わせてerrorsを配列形式で返す
+    return $this->response([
+      'status' => 'error',
+      'errors' => $errors,
     ], $status);
   }
 }
