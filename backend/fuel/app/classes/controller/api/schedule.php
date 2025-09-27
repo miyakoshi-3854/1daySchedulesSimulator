@@ -1,6 +1,7 @@
 <?php
 
 use Fuel\Core\Input;
+use Fuel\Core\Validation;
 
 class Controller_Api_Schedule extends Controller_Base_Api
 {
@@ -21,18 +22,124 @@ class Controller_Api_Schedule extends Controller_Base_Api
 
     // パラメータバリデーション (date or (start_date and end_date))
     if (!$date && !($start_date && $end_date)) {
-        return $this->error('Missing required parameter: date or (start_date and end_date)', 400);
+      return $this->error('Missing required parameter: date or (start_date and end_date)', 400);
     }
     
     // Model のメソッドを呼び出す (Model_Schedule の完全版が必要です)
     $schedules = Model_Schedule::get_user_schedules(
-        $user_id,
-        $date,
-        $start_date,
-        $end_date
+      $user_id,
+      $date,
+      $start_date,
+      $end_date
     );
 
     // 共通メソッドでレスポンス
     return $this->success($schedules);
+  }
+
+  /**
+   * POST /api/schedules
+   * 新しいスケジュールを作成
+   */
+  public function post_index()
+  {
+    // バリデーション
+    $validation = $this->validate_schedule_data();
+    if ($validation !== true) {
+      return $validation;
+    }
+
+    // データソース統一
+    $input_data = Input::post();
+
+    $schedule_data = [
+      'title'       => $input_data['title'],
+      'date'        => $input_data['date'],
+      'start_time'  => $input_data['start_time'],
+      'end_time'    => $input_data['end_time'],
+      'color'       => $input_data['color'] ?? '#3498db',
+      'note'        => $input_data['note'] ?? '',
+      'category_id' => $input_data['category_id'] ?? null,
+    ];
+
+    // 時間重複チェック
+    if (Model_Schedule::has_time_conflict(
+      $this->get_current_user_id(),
+      $schedule_data['date'],
+      $schedule_data['start_time'],
+      $schedule_data['end_time']
+    )) {
+      return $this->error('Time conflict with existing schedule', 409);
+    }
+
+    try {
+      $created_schedule = Model_Schedule::create_user_schedule($this->get_current_user_id(), $schedule_data);
+      return $this->success($created_schedule, 201);
+
+    } catch (\Exception $e) {
+      return $this->error($e->getMessage(), 500);
+    }
+  }
+
+  // ======================================================================
+  // Private Helper Methods
+  // ======================================================================
+
+  /**
+   * スケジュールデータのバリデーション
+   * @return mixed true（成功）またはエラーレスポンス
+   */
+  private function validate_schedule_data()
+  {
+    $val = Validation::forge();
+    $val->add('title', 'Title')->add_rule('required')->add_rule('max_length', 255);
+    $val->add('date', 'Date')->add_rule('required');
+    $val->add('start_time', 'Start Time')->add_rule('required');
+    $val->add('end_time', 'End Time')->add_rule('required');
+
+    // データソースの決定（POST/PUT両方に対応）
+    $input_source = (Input::method() === 'PUT') ? Input::put() : Input::post();
+    
+    // バリデーションにデータをセット
+    if (!$val->run($input_source)) {
+      return $this->validation_error($val->error_message());
+    }
+
+    // データ取得も $input_source から統一して行う
+    $date = $input_source['date'] ?? null;
+    $start_time = $input_source['start_time'] ?? null;
+    $end_time = $input_source['end_time'] ?? null;
+
+    // 日付形式チェック
+    if (!$this->validate_date($date)) {
+      return $this->error('Invalid date format. Use YYYY-MM-DD.', 400);
+    }
+
+    // 時間形式と論理チェック
+    if (!$this->validate_time($start_time) || !$this->validate_time($end_time)) {
+      return $this->error('Invalid time format. Use HH:MM:SS.', 400);
+    }
+
+    if ($start_time >= $end_time) {
+      return $this->error('End time must be after start time.', 400);
+    }
+
+    return true;
+  }
+
+  /**
+   * 日付形式バリデーション（YYYY-MM-DD）
+   */
+  private function validate_date($date)
+  {
+    return preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) && strtotime($date);
+  }
+
+  /**
+   * 時間形式バリデーション（HH:MM:SS）
+   */
+  private function validate_time($time)
+  {
+    return preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/', $time);
   }
 }

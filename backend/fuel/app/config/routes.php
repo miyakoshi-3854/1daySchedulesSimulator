@@ -10,7 +10,7 @@ return array(
 	'api/me'       => 'api/user/me', // ユーザーログイン状態確認API
 
 	// Schedule関連
-	'api/schedules' => 'api/schedule/index', // スケージュール一覧取得API
+	'api/schedules(/:id)?' => 'api/schedule', // これ一つで全てのCRUDに対応
 	
 	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 );

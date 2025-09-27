@@ -186,4 +186,105 @@ class Model_Schedule extends \Orm\Model
 			return array();
 		}
 	}
+
+	/**
+	 * 新しいスケジュールを作成
+	 * @param int $user_id ユーザーID
+	 * @param array $schedule_data スケジュールデータ
+	 * @return array 作成されたスケジュール情報
+	 * @throws \Exception 作成失敗時
+	 */
+	public static function create_user_schedule($user_id, $schedule_data)
+	{
+		try {
+			$schedule = static::forge(array(
+				'user_id'       => $user_id,
+				'title'         => $schedule_data['title'],
+				'date'          => $schedule_data['date'],
+				'start_time'    => $schedule_data['start_time'],
+				'end_time'      => $schedule_data['end_time'],
+				// デフォルト値を適用
+				'color'         => isset($schedule_data['color']) ? $schedule_data['color'] : '#FF0000',
+				'note'          => isset($schedule_data['note']) ? $schedule_data['note'] : '',
+				'category_id'   => isset($schedule_data['category_id']) ? $schedule_data['category_id'] : null,
+			));
+
+			if (!$schedule->save()) {
+				throw new \Exception('Failed to save schedule');
+			}
+
+			return static::format_schedule($schedule);
+
+		} catch (\Exception $e) {
+			\Log::error('Failed to create schedule: ' . $e->getMessage());
+			throw $e;
+		}
+	}
+
+	/**
+	 * スケジュールの時間重複チェック
+	 * @param int $user_id ユーザーID
+	 * @param string $date 日付
+	 * @param string $start_time 開始時間
+	 * @param string $end_time 終了時間
+	 * @param int|null $exclude_id 除外するスケジュールID（更新時用）
+	 * @return bool 重複があるかどうか
+	 */
+	public static function has_time_conflict($user_id, $date, $start_time, $end_time, $exclude_id = null)
+	{
+		$where = array(
+			array('user_id', $user_id),
+			array('date', $date),
+		);
+
+		if ($exclude_id) {
+			$where[] = array('id', '!=', $exclude_id);
+		}
+
+		try {
+			$schedules = static::find('all', array(
+				'where' => $where,
+			));
+
+			foreach ($schedules as $schedule) {
+				// 時間重複チェック: (A開始 < B終了) AND (A終了 > B開始)
+				if (($start_time < $schedule->end_time) && ($end_time > $schedule->start_time)) {
+					return true;
+				}
+			}
+
+			return false;
+
+		} catch (\Exception $e) {
+			\Log::error('Failed to check time conflict: ' . $e->getMessage());
+			return false;
+		}
+	}
+
+	// --- データ整形ヘルパー ---
+	
+	protected static function format_schedule($schedule)
+	{
+		// コントローラーへの戻り値を整形
+		return [
+			'id'          => $schedule->id,
+			'title'       => $schedule->title,
+			'date'        => $schedule->date,
+			'start_time'  => $schedule->start_time,
+			'end_time'    => $schedule->end_time,
+			'color'       => $schedule->color,
+			'note'        => $schedule->note,
+			'category_id' => $schedule->category_id,
+		];
+	}
+
+	protected static function format_schedules($schedules)
+	{
+		// 複数件のスケジュールを整形
+		$result = [];
+		foreach ($schedules as $schedule) {
+			$result[] = static::format_schedule($schedule);
+		}
+		return $result;
+	}
 }
