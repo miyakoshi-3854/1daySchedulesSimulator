@@ -145,4 +145,45 @@ class Model_Schedule extends \Orm\Model
 	 */
 	protected static $_table_name = 'schedules';
 
+	// ======================================================================
+	// スケジュール関連ビジネスロジック
+	// ======================================================================
+
+	/**
+	 * 指定されたユーザーの指定日のスケジュール一覧を取得
+	 * @param int $user_id ユーザーID
+	 * @param string $date 日付（YYYY-MM-DD形式）
+	 * @param string|null $start_date 開始日（期間指定時）
+	 * @param string|null $end_date 終了日（期間指定時）
+	 * @return array スケジュール一覧
+	 */
+	public static function get_user_schedules($user_id, $date = null, $start_date = null, $end_date = null)
+	{
+		$where = array(
+			array('user_id', $user_id)
+		);
+
+		// 日付条件を設定
+		if ($date) {
+			// 特定の日付
+			$where[] = array('date', $date);
+		} elseif ($start_date && $end_date) {
+			// 期間指定
+			$where[] = array('date', '>=', $start_date);
+			$where[] = array('date', '<=', $end_date);
+		}
+
+		try {
+			$schedules = static::find('all', array(
+				'where' => $where,
+				'order_by' => array('date' => 'asc', 'start_time' => 'asc'),
+			));
+
+			return static::format_schedules($schedules);
+
+		} catch (\Exception $e) {
+			\Log::error('Failed to get user schedules: ' . $e->getMessage());
+			return array();
+		}
+	}
 }
