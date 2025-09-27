@@ -121,4 +121,133 @@ class Model_User extends \Orm\Model
 	 */
 	protected static $_table_name = 'users';
 
+	// ======================================================================
+	// 認証に関するビジネスロジック
+	// ======================================================================
+
+	/**
+	 * ユーザー登録処理
+	 * @param string $username ユーザー名
+	 * @param string $email メールアドレス
+	 * @param string $password パスワード
+	 * @return array ユーザー情報（user_id, username, email）
+	 * @throws \SimpleUserUpdateException ユーザー作成失敗時
+	 */
+	public static function create_new_user($username, $email, $password)
+	{
+		// バリデーションは呼び出し元で実施済みという前提
+		// ここではビジネスロジックに集中
+		
+		try {
+			// FuelPHPの認証機能を使用（パスワードの自動ハッシュ化を含む）
+			$user_id = \Auth::create_user($username, $password, $email);
+			
+			return [
+				'user_id'  => $user_id,
+				'username' => $username,
+				'email'    => $email,
+			];
+		} catch (\SimpleUserUpdateException $e) {
+			// エラーをそのまま再投下（コントローラーでハンドリング）
+			throw $e;
+		}
+	}
+
+	/**
+	 * ユーザーログイン処理
+	 * @param string $email メールアドレス
+	 * @param string $password パスワード
+	 * @return array|false ログイン成功時はユーザー情報、失敗時はfalse
+	 */
+	public static function authenticate_user($email, $password)
+	{
+		// 認証を実行
+		if (!\Auth::login($email, $password)) {
+			return false;
+		}
+
+		// 認証成功時、ユーザー情報を取得して返す
+		return static::get_current_user_info();
+	}
+
+	/**
+	 * ユーザーログアウト処理
+	 * @return bool ログアウト可能だったかどうか
+	 */
+	public static function logout_user()
+	{
+		// ログイン状態チェック
+		if (!\Auth::check()) {
+			return false;
+		}
+
+		// remember-me クッキーを無効化
+		\Auth::dont_remember_me();
+		
+		// クライアント側のクッキー削除を明示
+		\Cookie::delete('fuelcid', '/');
+		\Cookie::delete('remember_me', '/');
+		
+		// ログアウト処理
+		\Auth::logout();
+		
+		// セッション破棄
+		\Session::destroy();
+		
+		return true;
+	}
+
+	/**
+	 * 現在ログイン中のユーザー情報を取得
+	 * @return array|null ユーザー情報またはnull（未ログイン時）
+	 */
+	public static function get_current_user_info()
+	{
+		if (!\Auth::check()) {
+				return null;
+		}
+		
+		try {
+			// Auth情報から基本情報を取得
+			$user_id  = \Auth::get_user_id()[1];
+			$username = \Auth::get_screen_name();
+			
+			// ORMでユーザー情報を取得（emailなど追加情報のため）
+			$user = static::find($user_id);
+			
+			if (!$user) {
+				// データベースに該当ユーザーが見つからない場合
+				return null;
+			}
+			
+			return [
+				'user_id'  => $user_id,
+				'username' => $username,
+				'email'    => $user->email,
+			];
+			
+		} catch (\Exception $e) {
+			// エラー時はnullを返す
+			\Log::error('Failed to get current user info: ' . $e->getMessage());
+			return null;
+		}
+	}
+
+	/**
+	 * ログイン状態確認
+	 * @return bool ログイン中かどうか
+	 */
+	public static function is_logged_in()
+	{
+		return \Auth::check();
+	}
+
+	/**
+	 * セッション情報を取得
+	 * @return string|null 現在のセッションID
+	 */
+	public static function get_session_id()
+	{
+		return static::is_logged_in() ? \Session::key() : null;
+	}
 }
