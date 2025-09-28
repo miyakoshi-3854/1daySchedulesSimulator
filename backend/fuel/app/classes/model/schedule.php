@@ -287,6 +287,33 @@ class Model_Schedule extends \Orm\Model
 	}
 
 	/**
+	 * ユーザーのスケジュールが存在する日付のリストを取得
+	 * (カレンダーの色付け機能用 - DBクラス使用)
+	 * @param int $user_id ユーザーID
+	 * @param string $start_date 期間の開始日 (YYYY-MM-DD)
+	 * @param string $end_date 期間の終了日 (YYYY-MM-DD)
+	 * @return array スケジュールが存在する日付の配列 ['YYYY-MM-DD', 'YYYY-MM-DD', ...]
+	 */
+	public static function get_dates_with_schedules($user_id, $start_date, $end_date)
+	{
+		// DBクラス (生SQL) を使用し、ユーザーIDと期間で絞り込み、日付を重複排除
+		$result = \DB::select(\DB::expr("DATE_FORMAT(`date`, '%Y-%m-%d') AS date_only"))
+			->distinct(true) 
+			->from(static::$_table_name) // 'schedules' テーブルを使用
+			->where('user_id', $user_id)
+			->where('date', '>=', $start_date)
+			->where('date', '<=', $end_date)
+			->execute(); // 結果を Database_Result オブジェクトとして取得
+
+		$dates = [];
+		foreach ($result as $row) {
+			$dates[] = $row['date_only'];
+		}
+
+		return $dates;
+	}
+
+	/**
 	 * スケジュールの時間重複チェック
 	 * @param int $user_id ユーザーID
 	 * @param string $date 日付
