@@ -222,6 +222,49 @@ class Model_Schedule extends \Orm\Model
 	}
 
 	/**
+	 * スケジュールを更新
+	 * @param int $schedule_id スケジュールID
+	 * @param int $user_id ユーザーID（所有者確認用）
+	 * @param array $schedule_data 更新データ
+	 * @return array 更新されたスケジュール情報
+	 * @throws \Exception 更新失敗時
+	 */
+	public static function update_user_schedule($schedule_id, $user_id, $schedule_data)
+	{
+		try {
+			$schedule = static::find($schedule_id);
+			
+			if (!$schedule) {
+				throw new \Exception('Schedule not found');
+			}
+
+			// 所有者確認
+			if ($schedule->user_id != $user_id) {
+				throw new \Exception('Permission denied');
+			}
+
+			// データを更新
+			$schedule->title        = $schedule_data['title'] ?? $schedule->title; 
+			$schedule->date         = $schedule_data['date'] ?? $schedule->date;
+			$schedule->start_time   = $schedule_data['start_time'] ?? $schedule->start_time;
+			$schedule->end_time     = $schedule_data['end_time'] ?? $schedule->end_time;
+			$schedule->color        = $schedule_data['color'] ?? $schedule->color;
+			$schedule->note         = $schedule_data['note'] ?? $schedule->note;
+			$schedule->category_id  = $schedule_data['category_id'] ?? $schedule->category_id;
+
+			if (!$schedule->save()) {
+				throw new \Exception('Failed to update schedule');
+			}
+
+			return static::format_schedule($schedule);
+
+		} catch (\Exception $e) {
+			\Log::error('Failed to update schedule: ' . $e->getMessage());
+			throw $e;
+		}
+	}
+
+	/**
 	 * スケジュールの時間重複チェック
 	 * @param int $user_id ユーザーID
 	 * @param string $date 日付
