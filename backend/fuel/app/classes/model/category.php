@@ -123,4 +123,49 @@ class Model_Category extends \Orm\Model
 	 */
 	protected static $_table_name = 'categories';
 
+	// ======================================================================
+	// カテゴリー関連 ビジネスロジック
+	// ======================================================================
+
+	/**
+	 * すべてのカテゴリー一覧を取得 (GET)
+	 * @return array カテゴリー一覧
+	 */
+	public static function get_all_categories()
+	{
+		// ORMを使用して全データを取得 (シンプル)
+		$categories = static::find('all', array(
+			'order_by' => array('id' => 'asc'),
+		));
+
+		return static::format_categories($categories);
+	}
+
+	/**
+	 * カテゴリーオブジェクトを API 向けに整形
+	 */
+	protected static function format_category($category)
+	{
+		return [
+			'id'              => $category->id,
+			'name'            => $category->name,
+			'default_title'   => $category->default_title,
+			'default_start'   => $category->default_start,
+			'default_end'     => $category->default_end,
+			'default_note'    => $category->default_note,
+			'default_color'   => $category->default_color,
+		];
+	}
+
+	/**
+	 * 複数件のカテゴリーを整形
+	 */
+	protected static function format_categories($categories)
+	{
+		$result = [];
+		foreach ($categories as $category) {
+			$result[] = static::format_category($category);
+		}
+		return $result;
+	}
 }
