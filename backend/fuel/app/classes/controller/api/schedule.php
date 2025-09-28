@@ -176,6 +176,30 @@ class Controller_Api_Schedule extends Controller_Base_Api
     }
   }
 
+  /**
+   * GET /api/schedules/dates
+   * スケジュールが存在する日付のリストを取得 (カレンダーハイライト用)
+   */
+  public function get_dates()
+  {
+    // before()で認証済み
+    $user_id = $this->get_current_user_id();
+    $start_date = Input::get('start_date');
+    $end_date = Input::get('end_date');     
+
+    if (!$start_date || !$end_date) {
+      return $this->error('Missing start_date or end_date parameter', 400);
+    }
+    
+    try {
+      $dates = Model_Schedule::get_dates_with_schedules($user_id, $start_date, $end_date);
+      return $this->success(['highlight_dates' => $dates]);
+    } catch (\Exception $e) {
+      \Log::error('Failed to get dates: ' . $e->getMessage());
+      return $this->error('Internal Server Error', 500);
+    }
+  }
+
   // ======================================================================
   // Private Helper Methods
   // ======================================================================
