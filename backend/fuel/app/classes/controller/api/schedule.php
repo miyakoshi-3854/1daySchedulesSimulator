@@ -142,6 +142,40 @@ class Controller_Api_Schedule extends Controller_Base_Api
     }
   }
 
+  /**
+   * DELETE /api/schedules/{id}
+   * スケジュールを削除
+   */
+  public function delete_index() // 引数なしに変更
+  {
+    // IDを URIセグメントから直接取得
+    // URLが /api/schedules/{id} の場合、セグメントは 3
+    $schedule_id = \Uri::segment(3); 
+
+    // IDが数値でない、または取得できなかった場合はエラー
+    if (!$schedule_id || !is_numeric($schedule_id)) {
+      return $this->error('Schedule ID is required or invalid', 400);
+    }
+    
+    $user_id = $this->get_current_user_id();
+
+    try {
+      // Modelでの削除処理（所有権チェックも含む）
+      Model_Schedule::delete_user_schedule($schedule_id, $user_id);
+      
+      // 成功時、204 No Contentを返す
+      return $this->success(null, 204); 
+
+    } catch (\Exception $e) {
+      // Modelから throw された例外をハンドリング
+      $status_code = 
+      ($e->getMessage() === 'Schedule not found') ? 404 : 
+      (($e->getMessage() === 'Permission denied') ? 403 : 500);
+
+      return $this->error($e->getMessage(), $status_code);
+    }
+  }
+
   // ======================================================================
   // Private Helper Methods
   // ======================================================================

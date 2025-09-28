@@ -265,6 +265,28 @@ class Model_Schedule extends \Orm\Model
 	}
 
 	/**
+	 * スケジュールを削除 (DELETE)
+	 * @throws \Exception 削除失敗時（見つからない、権限なし）
+	 */
+	public static function delete_user_schedule($schedule_id, $user_id)
+	{
+		try {
+			$schedule = static::find($schedule_id);
+			
+			if (!$schedule) {
+				throw new \Exception('Schedule not found');
+			}
+			if ($schedule->user_id != $user_id) {
+				throw new \Exception('Permission denied');
+			}
+			return $schedule->delete();
+		} catch (\Exception $e) {
+			\Log::error('Failed to delete schedule: ' . $e->getMessage());
+			throw $e;
+		}
+	}
+
+	/**
 	 * スケジュールの時間重複チェック
 	 * @param int $user_id ユーザーID
 	 * @param string $date 日付
