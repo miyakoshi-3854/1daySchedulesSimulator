@@ -9,3 +9,4 @@
 /fuel/app/config/crypt.php
 !*/.gitkeep
 cookies.txt
+cookies_secure.txt
