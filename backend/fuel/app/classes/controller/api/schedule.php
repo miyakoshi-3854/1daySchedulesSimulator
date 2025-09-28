@@ -81,6 +81,67 @@ class Controller_Api_Schedule extends Controller_Base_Api
     }
   }
 
+  /**
+   * PUT /api/schedules/{id}
+   * スケジュールを更新
+   */
+  public function put_index()
+  {
+    // URLから直接スケジュールIDを取得
+    $schedule_id = \Uri::segment(3); // /api/schedules/{id} の {id} 部分
+    
+    if (!$schedule_id) {
+      return $this->error('Schedule ID is required', 400);
+    }
+
+    // バリデーション
+    $validation = $this->validate_schedule_data();
+    if ($validation !== true) {
+      return $validation;
+    }
+
+    // データソース統一
+    $input_data = Input::put();
+
+    $schedule_data = [
+      'title'       => $input_data['title'] ?? null,
+      'date'        => $input_data['date'] ?? null,
+      'start_time'  => $input_data['start_time'] ?? null,
+      'end_time'    => $input_data['end_time'] ?? null,
+      'color'       => $input_data['color'] ?? null,
+      'note'        => $input_data['note'] ?? null,
+      'category_id' => $input_data['category_id'] ?? null,
+    ];
+
+    // 時間重複チェック（自分自身は除く）
+    if (Model_Schedule::has_time_conflict(
+      $this->get_current_user_id(),
+      $schedule_data['date'],
+      $schedule_data['start_time'],
+      $schedule_data['end_time'],
+      $schedule_id
+    )) {
+      return $this->error('Time conflict with existing schedule', 409);
+    }
+
+    try {
+      $updated_schedule = Model_Schedule::update_user_schedule(
+        $schedule_id,
+        $this->get_current_user_id(),
+        $schedule_data
+      );
+
+      return $this->success($updated_schedule);
+
+    } catch (\Exception $e) {
+      $status_code =
+      ($e->getMessage() === 'Schedule not found') ? 404 : 
+      (($e->getMessage() === 'Permission denied') ? 403 : 500);
+      
+      return $this->error($e->getMessage(), $status_code);
+    }
+  }
+
   // ======================================================================
   // Private Helper Methods
   // ======================================================================
