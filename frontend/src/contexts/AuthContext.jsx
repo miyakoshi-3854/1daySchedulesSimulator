@@ -1,3 +1,11 @@
+/*
+ * 認証状態を管理するためのカスタムフックを提供します。
+ *
+ * 目的：
+ * 1. 認証状態をグローバルに共有する。
+ * 2. 認証状態を操作するための統一された関数（ログイン、ログアウト、登録）を提供する。
+ * 3. コンポーネントツリーのどの場所からでも、これらの状態と関数に簡単にアクセスできるようにする。
+ */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 // API通信サービスをインポート
 import { checkAuthStatusAPI } from '../services/authService';
@@ -8,7 +16,11 @@ const AuthContext = createContext(null);
 // カスタムフック
 export const useAuth = () => useContext(AuthContext);
 
-// プロバイダーコンポーネント
+/*
+ * AuthContextProvider
+ * これでアプリケーションのルートコンポーナントをラップすることで、
+ * 子孫コンポーネントすべてに認証状態を提供できます。
+ */
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -32,11 +44,12 @@ export const AuthContextProvider = ({ children }) => {
         setIsLoggedIn(false);
       }
     } catch (error) {
-      // サービス内で通信エラーは捕捉済みだが、念のため
+      // サービス層で捕捉しきれなかった予期せぬエラーが発生した場合の最終的な処理
       console.error('Auth check failed in Context:', error);
       setUser(null);
       setIsLoggedIn(false);
     } finally {
+      // 処理結果（成功・失敗にかかわらず）に関わらず、ローディング状態を終了
       setIsLoading(false);
     }
   };
@@ -58,7 +71,8 @@ export const AuthContextProvider = ({ children }) => {
 
   return (
     <AuthContext value={value}>
-      {/* AuthContext に修正 */}
+      {/* ローディング完了（isLoadingがfalse）後のみ子コンポーネントを描画 */}
+      {/* これにより、認証チェックが完了するまでの不完全なUI表示を防ぐ */}
       {!isLoading ? children : <div>Loading authentication...</div>}
     </AuthContext>
   );
