@@ -8,7 +8,7 @@
  */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 // API通信サービスをインポート
-import { checkAuthStatusAPI } from '../services/authService';
+import { checkAuthStatusAPI, loginAPI } from '../services/authService';
 
 // Contextの作成
 const AuthContext = createContext(null);
@@ -59,12 +59,28 @@ export const AuthContextProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
+  // ====================================================================
+  // 2. ログイン関数 (loginAPI を呼び出し)
+  // ====================================================================
+  const login = async (email, password) => {
+    const result = await loginAPI(email, password);
+
+    if (result.success) {
+      setUser(result.user);
+      setIsLoggedIn(true);
+      return { success: true };
+    } else {
+      // エラーメッセージを AuthForm に返す
+      return { success: false, message: result.message };
+    }
+  };
+
   // 公開する値と関数
   const value = {
     user,
     isLoggedIn,
     isLoading,
-    login: async () => {}, // 実装予定
+    login,
     logout: async () => {}, // 実装予定
     register: async () => {}, // 実装予定
   };
