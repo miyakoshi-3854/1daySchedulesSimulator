@@ -68,3 +68,22 @@ export const loginAPI = async (email, password) => {
     return { success: false, message: data.message || 'Login failed' };
   }
 };
+
+/**
+ * ユーザーをログアウトさせる (POST /api/logout)
+ * @returns {Promise<boolean>} 成功/失敗
+ */
+export const logoutAPI = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    // ログアウトAPIは成功ステータス（200または204）であればOKと見なす
+    return response.ok;
+  } catch (error) {
+    console.error('Logout API failed:', error);
+    return false;
+  }
+};
