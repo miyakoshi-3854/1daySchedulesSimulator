@@ -8,7 +8,11 @@
  */
 import React, { createContext, useContext, useState, useEffect } from 'react';
 // API通信サービスをインポート
-import { checkAuthStatusAPI, loginAPI } from '../services/authService';
+import {
+  checkAuthStatusAPI,
+  loginAPI,
+  logoutAPI,
+} from '../services/authServices';
 
 // Contextの作成
 const AuthContext = createContext(null);
@@ -75,13 +79,29 @@ export const AuthContextProvider = ({ children }) => {
     }
   };
 
+  // ====================================================================
+  // 3. ログアウト関数 (logoutAPI を呼び出し)
+  // ====================================================================
+  const logout = async () => {
+    const success = await logoutAPI();
+
+    if (success) {
+      // 状態をリセット
+      setUser(null);
+      setIsLoggedIn(false);
+      // ログアウト後のページ遷移はコンポーネント側で行うのが一般的
+      return true;
+    }
+    return false;
+  };
+
   // 公開する値と関数
   const value = {
     user,
     isLoggedIn,
     isLoading,
     login,
-    logout: async () => {}, // 実装予定
+    logout,
     register: async () => {}, // 実装予定
   };
 
