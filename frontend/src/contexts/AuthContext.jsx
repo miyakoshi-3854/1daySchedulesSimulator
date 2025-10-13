@@ -1,52 +1,42 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+// API通信サービスをインポート
+import { checkAuthStatusAPI } from '../services/authService';
 
+// Contextの作成
 const AuthContext = createContext(null);
 
+// カスタムフック
 export const useAuth = () => useContext(AuthContext);
 
+// プロバイダーコンポーネント
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // APIのエンドポイント
-  const API_BASE_URL = 'http://localhost:8080/api'; // お使いのAPIのベースURLに合わせて調整してください
-
   // ====================================================================
-  // 1. 認証状態チェック関数 (GET /api/me)
+  // 1. 認証状態チェック関数 (checkAuthStatusAPI を呼び出し)
   // ====================================================================
   const checkAuthStatus = async () => {
     try {
-      // 認証Cookieを送るため、credentials: 'include' は必須です
-      const response = await fetch(`${API_BASE_URL}/me`, {
-        method: 'GET',
-        credentials: 'include',
-      });
+      // API通信の代わりにサービス層の関数を呼び出す
+      const userData = await checkAuthStatusAPI();
 
-      if (!response.ok) {
-        // HTTPステータスが200以外 (例: 401 Unauthorized) の場合
-        throw new Error('Failed to fetch user status');
-      }
-
-      const data = await response.json();
-
-      // バックエンドAPIのレスポンス形式を信頼: { status: "success", data: { logged_in: true/false, ...user_info } }
-      if (data.status === 'success' && data.data.logged_in === true) {
-        // ログイン済みの場合、状態を更新
-        setUser(data.data);
+      if (userData) {
+        // ユーザー情報が返ってきた場合 (ログイン済み)
+        setUser(userData);
         setIsLoggedIn(true);
       } else {
-        // 未ログインの場合、状態をリセット
+        // null が返ってきた場合 (未ログイン or エラー)
         setUser(null);
         setIsLoggedIn(false);
       }
     } catch (error) {
-      console.error('Auth check failed:', error);
-      // 通信エラーやサーバーエラーが発生した場合も未ログインとして扱う
+      // サービス内で通信エラーは捕捉済みだが、念のため
+      console.error('Auth check failed in Context:', error);
       setUser(null);
       setIsLoggedIn(false);
     } finally {
-      // 認証チェックが完了したため、ローディングを終了
       setIsLoading(false);
     }
   };
@@ -68,7 +58,7 @@ export const AuthContextProvider = ({ children }) => {
 
   return (
     <AuthContext value={value}>
-      {/* ローディング完了後のみ子コンポーネントを表示 */}
+      {/* AuthContext に修正 */}
       {!isLoading ? children : <div>Loading authentication...</div>}
     </AuthContext>
   );
