@@ -13,11 +13,11 @@ import React, { createContext, useContext, useState } from 'react';
 const DateContext = createContext();
 
 /*
- * DateProvider
+ * DateContextProvider
  * これでアプリケーションのルートコンポーネントをラップすることで、
  * 子孫コンポーネントすべてに日付の状態を提供できます。
  */
-export const DateProvider = ({ children }) => {
+export const DateContextProvider = ({ children }) => {
   // useStateフックを使って、現在の日付を状態として管理します。
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -79,13 +79,13 @@ export const DateProvider = ({ children }) => {
 
 /*
  * useDateは、DateContextから値を読み取るためのカスタムフックです。
- * このフックを使用するコンポーネントは、必ずDateProviderの子である必要があります。
+ * このフックを使用するコンポーネントは、必ずDateContextProviderの子である必要があります。
  */
 export const useDate = () => {
   const context = useContext(DateContext);
   // Providerの外でフックが呼び出された場合に、開発者に警告するエラーをスローします。
   if (!context) {
-    throw new Error('useDate must be used within a DateProvider');
+    throw new Error('useDate must be used within a DateContextProvider');
   }
   return context;
 };
