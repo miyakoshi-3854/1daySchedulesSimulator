@@ -42,3 +42,29 @@ export const checkAuthStatusAPI = async () => {
     return null;
   }
 };
+
+/**
+ * ユーザーをログインさせる (POST /api/login)
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<object>} 成功時はユーザー情報、失敗時はエラーオブジェクト
+ */
+export const loginAPI = async (email, password) => {
+  const response = await fetch(`${API_BASE_URL}/login`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded', // FuelPHPのInput::post()に対応
+    },
+    body: new URLSearchParams({ email, password }), // URLSearchParamsでフォームデータ形式に変換
+  });
+
+  const data = await response.json();
+
+  if (response.ok && data.status === 'success') {
+    return { success: true, user: data.data }; // 成功
+  } else {
+    // APIからのエラーメッセージをそのまま返す
+    return { success: false, message: data.message || 'Login failed' };
+  }
+};
