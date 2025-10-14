@@ -26,6 +26,8 @@ class Controller_Base_Api extends Controller_Rest
     // Preflight (OPTIONS) リクエスト対応
     if (\Input::method() === 'OPTIONS') {
       return Response::forge('', 200);
+      $response->send();
+      exit;
     }
 
     // 認証チェック（継承クラスで true の場合のみ実行）
