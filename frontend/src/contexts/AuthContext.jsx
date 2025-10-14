@@ -36,7 +36,7 @@ export const AuthContextProvider = ({ children }) => {
   // ====================================================================
   const checkAuthStatus = async () => {
     try {
-      // API通信の代わりにサービス層の関数を呼び出す
+      // サービス層の関数を呼び出し、セッションに基づきユーザーデータを取得
       const userData = await checkAuthStatusAPI();
 
       if (userData) {
@@ -68,14 +68,16 @@ export const AuthContextProvider = ({ children }) => {
   // 2. ログイン関数 (loginAPI を呼び出し)
   // ====================================================================
   const login = async (email, password) => {
+    // サービス層のログインAPIを呼び出し、結果を受け取る
     const result = await loginAPI(email, password);
 
     if (result.success) {
+      // ログイン成功: ユーザー情報とログイン状態を更新
       setUser(result.user);
       setIsLoggedIn(true);
       return { success: true };
     } else {
-      // エラーメッセージを AuthForm に返す
+      // ログイン失敗: エラーメッセージを呼び出し元（フォーム）に返す
       return { success: false, message: result.message };
     }
   };
@@ -84,34 +86,38 @@ export const AuthContextProvider = ({ children }) => {
   // 3. ログアウト関数 (logoutAPI を呼び出し)
   // ====================================================================
   const logout = async () => {
+    // サービス層のログアウトAPIを呼び出す
     const success = await logoutAPI();
 
     if (success) {
-      // 状態をリセット
+      // ログアウト成功: 状態をリセット
       setUser(null);
       setIsLoggedIn(false);
-      // ログアウト後のページ遷移はコンポーネント側で行うのが一般的
       return true;
     }
+    // ログアウトAPIが失敗した場合（例: サーバー通信エラー）
     return false;
   };
 
-  /**
-   * 新規登録を行い、成功時にログイン状態にする
-   */
+  // ====================================================================
+  // 4. 新規ユーザー登録関数 (registerAPI を呼び出し)
+  // ====================================================================
   const register = async (username, email, password) => {
     try {
+      // サービス層の登録APIを呼び出し
       const result = await registerAPI(username, email, password);
 
       if (result.success) {
-        // 登録成功と同時にログイン状態へ更新
+        // 登録成功: サーバー側で自動ログインされていることを想定し、状態を更新
         setUser(result.user);
         setIsLoggedIn(true);
         return { success: true };
       } else {
+        // 登録失敗: エラーメッセージを呼び出し元に返す
         return { success: false, message: result.message };
       }
     } catch (error) {
+      // 予期せぬエラー発生時
       return { success: false, message: '予期せぬエラーが発生しました。' };
     }
   };
