@@ -87,3 +87,43 @@ export const logoutAPI = async () => {
     return false;
   }
 };
+
+/**
+ * ユーザーを新規登録するAPIを呼び出す
+ * @param {string} username - ユーザー名
+ * @param {string} email - Eメールアドレス
+ * @param {string} password - パスワード
+ * @returns {Promise<{success: boolean, message: string, user: object}>}
+ */
+export const registerAPI = async (username, email, password) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        username: username,
+        email: email,
+        password: password,
+      }),
+    });
+
+    // 200 OKの場合、成功
+    if (response.ok) {
+      const data = await response.json();
+      // 登録成功と同時にログイン状態になることを想定
+      return { success: true, user: data.data };
+    }
+
+    // 400 Bad Request などのエラー処理
+    const errorData = await response.json();
+    return {
+      success: false,
+      message: errorData.message || '登録に失敗しました。',
+    };
+  } catch (error) {
+    console.error('Registration API error:', error);
+    return { success: false, message: 'ネットワークエラーが発生しました。' };
+  }
+};
