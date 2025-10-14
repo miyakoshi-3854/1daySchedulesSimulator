@@ -1,70 +1,104 @@
+/*
+ * AuthForm.jsx
+ * 認証フォームコンポーネント
+ *
+ * 目的：
+ * 1. ユーザー認証（ログイン/登録）のためのフォームを提供する。
+ * 2. 認証状態をグローバルに共有するContext（AuthContext）と連携し、
+ *    認証関連のロジックを分離する。
+ */
 import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext'; // AuthContextからロジックを取得
+import { useAuth } from '../contexts/AuthContext';
 
-// propsとしてモーダルを閉じる関数を受け取ることを想定
+/**
+ * ログインおよび新規登録フォームコンポーネント
+ * @param {object} props.onClose - フォーム（モーダル）を閉じるための関数
+ */
 export const AuthForm = ({ onClose }) => {
   // --- 1. フォームの状態管理 ---
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false); // 多重送信防止
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // ログインモードと登録モードの切り替え (今回はログインに固定)
+  // ログインモード(true)と登録モード(false)の切り替え状態
   const [isLoginMode, setIsLoginMode] = useState(true);
 
-  // AuthContextから login 関数を取得
-  const { login } = useAuth();
+  // AuthContextから login と register 関数を取得
+  const { login, register } = useAuth();
+
+  // モード切り替え時の処理（タブクリック時）
+  const handleModeSwitch = (isLogin) => {
+    setIsLoginMode(isLogin);
+    setError('');
+  };
 
   // --- 2. フォーム送信ハンドラ ---
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // 1. 必須項目のチェック (ここで空文字は捕捉される)
+    const isRegister = !isLoginMode;
+
+    // 1. ローカルバリデーション
+    if (isRegister && !username) {
+      // 新規登録時、ユーザー名が必須
+      setError('ユーザー名は必須です。');
+      return;
+    }
     if (!email || !password) {
+      // どちらのモードでも、EmailとPasswordは必須
       setError('Email and password are required.');
       return;
     }
-
-    // 2. メールアドレス形式のチェック
+    // 簡易的なメールアドレス形式チェック
     if (!email.includes('@') || email.length < 5) {
       setError('有効なメールアドレスを入力してください。');
       return;
     }
 
     setIsSubmitting(true);
+    let result;
 
-    // ログインAPIの実行
-    const result = await login(email, password);
+    // 2. API実行 (モードで切り替え)
+    if (isLoginMode) {
+      // ログインモードの場合、AuthContextの login 関数を実行
+      result = await login(email, password);
+    } else {
+      // 新規登録モードの場合、AuthContextの register 関数を実行
+      result = await register(username, email, password);
+    }
 
+    // 3. 結果処理
     if (result.success) {
-      // ログイン成功: モーダルを閉じる
+      // 成功: 認証状態が更新されたので、モーダルを閉じる
       onClose();
     } else {
-      // ログイン失敗: エラーメッセージを表示
-      setError(result.message || 'ログインに失敗しました。');
-      setIsSubmitting(false); // 再度送信できるようにする
+      // 失敗: エラーメッセージを設定
+      setError(
+        result.message ||
+          (isLoginMode ? 'ログインに失敗しました。' : '登録に失敗しました。')
+      );
+      setIsSubmitting(false);
     }
   };
 
   // --- 3. レンダリング ---
   return (
-    // モーダル背景やコンテナは Header コンポーネント側で実装することを想定
     <div className="auth-modal">
       <form className="auth-form-content" onSubmit={handleSubmit} noValidate>
-        {/* ログイン/新規登録のタブ部分 */}
+        {/* タブ部分 (モード切り替えUI) */}
         <div className="auth-tabs">
           <span
             className={isLoginMode ? 'active' : 'inactive'}
-            onClick={() => setIsLoginMode(true)}
-            // スタイルはCSSで実装
+            onClick={() => handleModeSwitch(true)}
           >
             ログイン
           </span>
           <span
             className={!isLoginMode ? 'active' : 'inactive'}
-            onClick={() => setIsLoginMode(false)}
-            // 今回はログインのみなのでボタンは機能しない
+            onClick={() => handleModeSwitch(false)}
           >
             新規登録
           </span>
@@ -73,9 +107,21 @@ export const AuthForm = ({ onClose }) => {
         {/* エラーメッセージの表示 */}
         {error && <p className="error-message">{error}</p>}
 
-        {/* ユーザー名は新規登録時のみ表示（今回は省略） */}
+        {/* ユーザー名 (新規登録時のみ表示) */}
+        {!isLoginMode && (
+          <>
+            <label htmlFor="username">ユーザー名</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={isSubmitting}
+            />
+          </>
+        )}
 
-        {/* Email */}
+        {/* Email 入力欄 */}
         <label htmlFor="email">email</label>
         <input
           id="email"
@@ -85,7 +131,7 @@ export const AuthForm = ({ onClose }) => {
           disabled={isSubmitting}
         />
 
-        {/* Password */}
+        {/* Password 入力欄 */}
         <label htmlFor="password">password</label>
         <input
           id="password"
@@ -95,10 +141,10 @@ export const AuthForm = ({ onClose }) => {
           disabled={isSubmitting}
         />
 
-        {/* ボタン群 */}
+        {/* ボタン群 (表示名をモードで切り替え) */}
         <div className="form-actions">
           <button type="submit" disabled={isSubmitting} className="btn-primary">
-            {isSubmitting ? '処理中...' : 'ログイン'}
+            {isSubmitting ? '処理中...' : isLoginMode ? 'ログイン' : '登録'}
           </button>
           <button
             type="button"
