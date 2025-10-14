@@ -12,6 +12,7 @@ import {
   checkAuthStatusAPI,
   loginAPI,
   logoutAPI,
+  registerAPI,
 } from '../services/authServices';
 
 // Contextの作成
@@ -95,6 +96,26 @@ export const AuthContextProvider = ({ children }) => {
     return false;
   };
 
+  /**
+   * 新規登録を行い、成功時にログイン状態にする
+   */
+  const register = async (username, email, password) => {
+    try {
+      const result = await registerAPI(username, email, password);
+
+      if (result.success) {
+        // 登録成功と同時にログイン状態へ更新
+        setUser(result.user);
+        setIsLoggedIn(true);
+        return { success: true };
+      } else {
+        return { success: false, message: result.message };
+      }
+    } catch (error) {
+      return { success: false, message: '予期せぬエラーが発生しました。' };
+    }
+  };
+
   // 公開する値と関数
   const value = {
     user,
@@ -102,7 +123,8 @@ export const AuthContextProvider = ({ children }) => {
     isLoading,
     login,
     logout,
-    register: async () => {}, // 実装予定
+    register,
+    checkAuthStatus,
   };
 
   return (
