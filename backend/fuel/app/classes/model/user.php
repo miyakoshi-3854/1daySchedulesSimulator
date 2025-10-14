@@ -181,19 +181,45 @@ class Model_User extends \Orm\Model
 			return false;
 		}
 
-		// remember-me クッキーを無効化
-		\Auth::dont_remember_me();
-		
-		// クライアント側のクッキー削除を明示
-		\Cookie::delete('fuelcid', '/');
-		\Cookie::delete('remember_me', '/');
-		
-		// ログアウト処理
-		\Auth::logout();
-		
-		// セッション破棄
-		\Session::destroy();
-		
+    // ------------------------------------------------------------------
+    // 1. Authシステムのログアウト処理とリメンバーミーの無効化
+    // ------------------------------------------------------------------
+    // SimpleAuth のリメンバーミー無効化は、セッション終了前に実行する
+    \Auth::dont_remember_me(); 
+    \Auth::logout();
+    
+    // ------------------------------------------------------------------
+    // 2. Cookie設定の取得
+    // ------------------------------------------------------------------
+    // セッションCookie設定を取得
+    $session_config = \Config::get('session.cookie', []); 
+    
+    // リメンバーミーCookie設定を取得
+    $remember_config = \Config::get('simpleauth.remember_me', []);
+    
+    // ------------------------------------------------------------------
+    // 3. セッションCookie (fuelcid) の削除
+    // ------------------------------------------------------------------
+    \Cookie::delete(
+        \Config::get('session.cookie.name', 'fuelcid'), 
+        $session_config['path'] ?? '/',           
+        $session_config['domain'] ?? null,        
+        $session_config['secure'] ?? false        
+    );
+    
+    // ------------------------------------------------------------------
+    // 4. リメンバーミーCookieの削除 (SimpleAuthの設定を完全に利用)
+    // ------------------------------------------------------------------
+    \Cookie::delete(
+        $remember_config['cookie_name'] ?? 'remember_me', // 名前
+        $remember_config['cookie_path'] ?? '/',           // パス
+        $remember_config['cookie_domain'] ?? null,
+        $remember_config['cookie_secure'] ?? false
+    );
+    
+    // セッションデータ自体を破棄
+    \Session::destroy();
+
 		return true;
 	}
 
