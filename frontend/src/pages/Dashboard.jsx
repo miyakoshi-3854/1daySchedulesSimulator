@@ -2,11 +2,11 @@
 
 import { AuthContextProvider } from '../contexts/AuthContext';
 import { DateContextProvider } from '../contexts/DateContext';
-import Header from '../components/Header';
-import Calendar from '../components/Calendar';
-import TimeGraph from '../components/TimeGraph';
-import ScheduleList from '../components/ScheduleList';
-import ScheduleForm from '../components/ScheduleForm';
+import { Header } from '../components/Header';
+// import Calendar from '../components/Calendar';
+// import TimeGraph from '../components/TimeGraph';
+// import ScheduleList from '../components/ScheduleList';
+// import ScheduleForm from '../components/ScheduleForm';
 
 export default function DashBoard() {
   return (
@@ -16,10 +16,10 @@ export default function DashBoard() {
       <DateContextProvider>
         <Header /> {/* Header (AuthFormを含む) */}
         <div className="main-content-grid">
-          <Calendar />
+          {/* <Calendar />
           <TimeGraph />
           <ScheduleList />
-          <ScheduleForm />
+          <ScheduleForm /> */}
         </div>
       </DateContextProvider>
     </AuthContextProvider>
