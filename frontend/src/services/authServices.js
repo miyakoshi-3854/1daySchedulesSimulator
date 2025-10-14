@@ -97,7 +97,7 @@ export const logoutAPI = async () => {
  */
 export const registerAPI = async (username, email, password) => {
   try {
-    const response = await fetch(`${BASE_URL}/register`, {
+    const response = await fetch(`${API_BASE_URL}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
