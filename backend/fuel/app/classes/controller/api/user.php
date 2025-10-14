@@ -10,21 +10,35 @@ class Controller_Api_User extends Controller_Base_Api
   protected $format = 'json';
 
   /**
+   * OPTIONS /api/register
+   * CORS Preflight リクエストを処理する
+   * Controller_Rest の仕様上、明示的に定義する
+   */
+  public function options_register()
+  {
+  // 処理は base/api.php の before() で行われるため、
+  // ここでは空のメソッドを定義する
+  }
+  
+  /**
    * POST /api/register
    * ユーザー登録処理
    */
   public function post_register()
   {
-    $validation = $this->validate_registration();
+    // JSONデータ全体を取得
+    $input_data = \Input::json(); 
+
+    $validation = $this->validate_registration($input_data);
     if ($validation !== true) {
       return $validation; 
     }
 
     try {
       $user_data = Model_User::create_new_user(
-        Input::post('username'),
-        Input::post('email'),
-        Input::post('password')
+        $input_data['username'],
+        $input_data['email'],
+        $input_data['password']
       );
 
       return $this->success($user_data, 201); // 共通 success を使用
@@ -97,14 +111,14 @@ class Controller_Api_User extends Controller_Base_Api
    * ユーザー登録用バリデーション
    * @return mixed true（成功）またはエラーレスポンス
    */
-  private function validate_registration()
+  private function validate_registration($data)
   {
     $val = Validation::forge();
     $val->add('username', 'Username')->add_rule('required');
     $val->add('email', 'Email')->add_rule('required')->add_rule('valid_email');
     $val->add('password', 'Password')->add_rule('required')->add_rule('min_length', 6);
 
-    if (!$val->run()) {
+    if (!$val->run($data)) {
       // 共通 validation_error を使用
       return $this->validation_error($val->error_message());
     }
