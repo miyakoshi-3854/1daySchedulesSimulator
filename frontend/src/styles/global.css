@@ -1,0 +1,51 @@
+:root {
+  /* 1. タイポグラフィと基本設定 */
+  --spacing-unit: 8px;
+  --font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
+    'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+
+  /* 2. カラーパレット定義 */
+
+  /* 文字色 */
+  --color-text-light: #eaeaea;
+
+  /* 背景色 (提供された情報に基づく) */
+  --color-background-app: #1c1c1c; /* 背景色1 (TimeGraphやアプリ全体のベース) */
+  --color-surface-card: #131313; /* 背景色2 (ScheduleList, Form, Modalの背景) */
+
+  /* ボタンカラー */
+  --color-button-positive: #38b6ff; /* 肯定的なアクション (青) */
+  --color-button-negative: #ff3131; /* 否定的なアクション (赤/全削除) */
+
+  /* ホバー時の暗いバージョン */
+  --color-button-positive-dark: #2a8fc2;
+  --color-button-negative-dark: #cc2727;
+}
+
+/* 3. body/htmlへのベーススタイルの適用 (global.css) */
+body,
+html,
+#root {
+  /* 最も広い背景には背景色2を適用 */
+  background-color: var(--color-background-app);
+  color: var(--color-text-light);
+}
+
+/* 4. 共通ボタンの再定義 (global.css) */
+.btn-primary {
+  background-color: var(--color-button-positive);
+  color: var(--color-text-light); /* 文字色は白 */
+}
+.btn-primary:hover {
+  background-color: var(--color-button-positive-dark);
+}
+
+/* 否定ボタンや「全削除」ボタン */
+.btn-danger {
+  background-color: var(--color-button-negative);
+  color: var(--color-text-light);
+}
+.btn-danger:hover {
+  background-color: var(--color-button-negative-dark);
+}
