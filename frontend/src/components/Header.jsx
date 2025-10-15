@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useDate } from '../contexts/DateContext';
 import { AuthForm } from './AuthForm';
 import ko from 'knockout'; // 課題の条件： knockout.jsを使用する
+import styles from '../styles/Header.module.css';
 
 /*
  * アプリケーションのヘッダーコンポーネント
@@ -84,64 +85,70 @@ export const Header = () => {
   };
 
   return (
-    <header className="app-header">
-      <div className="logo">スケジュール シュミレーター</div>
+    <header className={styles.header}>
+      <div className={styles.logo}>スケジュール シュミレーター</div>
 
       {/* Knockout.jsが制御する日付操作コンテナ（バインディングターゲット） */}
-      <div id="date-controls-container" className="date-controls">
+      <div
+        id="date-controls-container"
+        className={styles.dateControlsContainer}
+      >
         {/* 1. 「今日」ボタン - Reactで制御（Contextの関数を直接呼び出し） */}
-        <button onClick={goToToday} className="btn-today">
+        <button onClick={goToToday} className={styles.btnToday}>
           今日
         </button>
 
         {/* 2. 月の移動ボタン */}
-        <span className="month-nav-full">
+        <span className={styles.monthNavFull}>
           {/* 月変更（前月へ）*/}
-          <button onClick={goToPrevMonth} className="btn-month-nav-full">
+          <button onClick={goToPrevMonth} className={styles.btnMonthNavFull}>
             &laquo; {/* << */}
           </button>
         </span>
 
         {/* 3. 日の移動と日付表示 */}
-        <span className="day-nav-group">
+        <span className={styles.dayNavGroup}>
           {/* 日変更（前日へ） */}
-          <button onClick={goToPrevDay} className="btn-day-nav">
+          <button onClick={goToPrevDay} className={styles.btnDayNav}>
             &lsaquo; {/* < */}
           </button>
 
           {/* Knockoutバインディング：日付表示 (2025年8月31日) */}
-          <h2 className="current-day-display" data-bind="text: displayDate">
+          <h2
+            className={styles.currentDayDisplay}
+            data-bind="text: displayDate"
+          >
             {/* 初期値 */}
           </h2>
 
           {/* 日変更（翌日へ） */}
-          <button onClick={goToNextDay} className="btn-day-nav">
+          <button onClick={goToNextDay} className={styles.btnDayNav}>
             &rsaquo; {/* > */}
           </button>
         </span>
 
         {/* 4. 月の移動ボタン */}
-        <span className="month-nav-full">
+        <span className={styles.monthNavFull}>
           {/* 月変更（翌月へ） */}
-          <button onClick={goToNextMonth} className="btn-month-nav-full">
+          <button onClick={goToNextMonth} className={styles.btnMonthNavFull}>
             &raquo; {/* >> */}
           </button>
         </span>
       </div>
 
       {/* 画面右側の認証UI */}
-      <div className="auth-status-area">
+      <div className={styles.authStatusArea}>
         {isLoggedIn ? (
           // 認証済みの場合
-          <div className="user-info">
+          <div className={styles.userInfo}>
             <span>ようこそ, {user?.username || 'ユーザー'}さん</span>
-            <button onClick={handleLogout} className="btn-logout">
+            <button onClick={handleLogout} className={styles.btnLogout}>
               ログアウト
             </button>
           </div>
         ) : (
           // 未認証の場合
-          <button onClick={handleAuthClick} className="btn-login-register">
+          <button onClick={handleAuthClick} className={styles.btnLoginRegister}>
             ログイン / 新規登録
           </button>
         )}
