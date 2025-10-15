@@ -94,35 +94,37 @@ export const Header = () => {
           今日
         </button>
 
-        {/* 2. 月の移動ボタンと表示 */}
-        <span className="month-nav">
-          {/* Reactで操作関数を呼び出すが、表示の更新はKnockoutが行う */}
-          <button onClick={goToPrevMonth} className="btn-month-nav">
-            &lt;
-          </button>
-          {/* ★Knockoutバインディング：displayMonthYearの値をテキストとして表示★ */}
-          <span
-            className="current-month-year"
-            data-bind="text: displayMonthYear"
-          >
-            {/* この部分はKnockoutによって上書きされる */}
-          </span>
-          <button onClick={goToNextMonth} className="btn-month-nav">
-            &gt;
+        {/* 2. 月の移動ボタン */}
+        <span className="month-nav-full">
+          {/* 月変更（前月へ）*/}
+          <button onClick={goToPrevMonth} className="btn-month-nav-full">
+            &laquo; {/* << */}
           </button>
         </span>
 
-        {/* 3. 日の移動と日付表示 (メイン) */}
-        <span className="day-nav">
+        {/* 3. 日の移動と日付表示 */}
+        <span className="day-nav-group">
+          {/* 日変更（前日へ） */}
           <button onClick={goToPrevDay} className="btn-day-nav">
-            &lt;
+            &lsaquo; {/* < */}
           </button>
-          {/* ★Knockoutバインディング：displayDateの値をテキストとして表示★ */}
+
+          {/* Knockoutバインディング：日付表示 (2025年8月31日) */}
           <h2 className="current-day-display" data-bind="text: displayDate">
-            {/* この部分もKnockoutによって上書きされる */}
+            {/* 初期値 */}
           </h2>
+
+          {/* 日変更（翌日へ） */}
           <button onClick={goToNextDay} className="btn-day-nav">
-            &gt;
+            &rsaquo; {/* > */}
+          </button>
+        </span>
+
+        {/* 4. 月の移動ボタン */}
+        <span className="month-nav-full">
+          {/* 月変更（翌月へ） */}
+          <button onClick={goToNextMonth} className="btn-month-nav-full">
+            &raquo; {/* >> */}
           </button>
         </span>
       </div>
