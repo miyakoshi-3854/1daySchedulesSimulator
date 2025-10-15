@@ -43,16 +43,17 @@ class Controller_Api_Schedule extends Controller_Base_Api
    */
   public function post_index()
   {
+    // JSONデータ全体を取得
+    $input_data = \Input::json();
+
     // バリデーション
-    $validation = $this->validate_schedule_data();
+    $validation = $this->validate_schedule_data($input_data); // 引数 $input_data を渡す
     if ($validation !== true) {
       return $validation;
     }
 
-    // データソース統一
-    $input_data = Input::post();
-
     $schedule_data = [
+      // $input_data から値を直接取得
       'title'       => $input_data['title'],
       'date'        => $input_data['date'],
       'start_time'  => $input_data['start_time'],
@@ -94,16 +95,17 @@ class Controller_Api_Schedule extends Controller_Base_Api
       return $this->error('Schedule ID is required', 400);
     }
 
+    // JSONデータ全体を取得
+    $input_data = \Input::json(); 
+
     // バリデーション
-    $validation = $this->validate_schedule_data();
+    $validation = $this->validate_schedule_data($input_data); // 引数 $input_data を渡す
     if ($validation !== true) {
       return $validation;
     }
 
-    // データソース統一
-    $input_data = Input::put();
-
     $schedule_data = [
+      // $input_data から値を直接取得
       'title'       => $input_data['title'] ?? null,
       'date'        => $input_data['date'] ?? null,
       'start_time'  => $input_data['start_time'] ?? null,
@@ -208,26 +210,23 @@ class Controller_Api_Schedule extends Controller_Base_Api
    * スケジュールデータのバリデーション
    * @return mixed true（成功）またはエラーレスポンス
    */
-  private function validate_schedule_data()
+  private function validate_schedule_data($data) // 引数 $data を受け取る
   {
     $val = Validation::forge();
     $val->add('title', 'Title')->add_rule('required')->add_rule('max_length', 255);
     $val->add('date', 'Date')->add_rule('required');
     $val->add('start_time', 'Start Time')->add_rule('required');
     $val->add('end_time', 'End Time')->add_rule('required');
-
-    // データソースの決定（POST/PUT両方に対応）
-    $input_source = (Input::method() === 'PUT') ? Input::put() : Input::post();
     
     // バリデーションにデータをセット
-    if (!$val->run($input_source)) {
+    if (!$val->run($data)) {
       return $this->validation_error($val->error_message());
     }
 
-    // データ取得も $input_source から統一して行う
-    $date = $input_source['date'] ?? null;
-    $start_time = $input_source['start_time'] ?? null;
-    $end_time = $input_source['end_time'] ?? null;
+    // データ取得も $data から統一して行う
+    $date = $data['date'] ?? null;
+    $start_time = $data['start_time'] ?? null;
+    $end_time = $data['end_time'] ?? null;
 
     // 日付形式チェック
     if (!$this->validate_date($date)) {
