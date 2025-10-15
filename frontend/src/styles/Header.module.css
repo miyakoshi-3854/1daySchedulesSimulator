@@ -1,0 +1,89 @@
+/* 1. Header全体のコンテナスタイル */
+.header {
+  /* Reactコンポーネントの <header> タグに適用 */
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 要素を左右と中央に分ける */
+
+  padding: 16px 24px; /* 上下左右のパディング */
+  background-color: var(
+    --color-surface
+  ); /* styles/_variables.css の変数を想定 */
+  position: relative; /* 中央配置の日付エリアの基準 */
+  width: 100%;
+  box-sizing: border-box;
+  height: 60px; /* 高さを固定 */
+
+  font-family: var(--font-stack);
+  color: var(--color-text-light); /* 文字色が確実に適用されるように */
+}
+
+/* 2. 日付操作エリア（中央）の配置 */
+.dateControlsContainer {
+  /* Absoluteでヘッダーの中央に強制配置 */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  /* 日付コントロール内の配置 */
+  display: flex;
+  align-items: center;
+  gap: 8px; /* 要素間のスペース */
+
+  /* 中央に配置される要素が左右の要素と重ならないよう、z-indexを設定することが多い */
+  z-index: 1;
+}
+
+/* 3. 日付と日変更ボタンのグループ */
+.dayNavGroup {
+  display: flex;
+  align-items: center;
+  gap: 16px; /* 日付とボタンの間隔 */
+}
+
+/* 4. 認証UIエリア（右端） */
+.authStatusArea {
+  /* Flexの配置で右端に固定される */
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 2; /* 最前面に表示 */
+}
+
+/* 5. ロゴと認証エリアが中央の要素と重なっても縮まないように */
+.logo {
+  flex-shrink: 0;
+}
+
+/* 6. 個別要素のスタイリング (任意) */
+.currentDayDisplay {
+  font-size: 1.5em;
+  font-weight: bold;
+  font-family: var(--font-stack);
+  margin: 0;
+}
+
+/* 日付操作ボタンの共通スタイル */
+.btnToday,
+.btnDayNav,
+.btnMonthNavFull {
+  /* グローバルCSSの .btn を継承することを想定 */
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.1s;
+}
+
+.btnToday:hover,
+.btnDayNav:hover,
+.btnMonthNavFull:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btnMonthNavFull {
+  font-size: 1.2em; /* 月変更ボタンを少し大きく */
+}

@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 services:
   # FuelPHP (Backend) コンテナ
@@ -8,7 +8,7 @@ services:
       dockerfile: Dockerfile
     container_name: fuelphp-app
     ports:
-      - "8080:80"
+      - '8080:80'
     volumes:
       - ./backend:/var/www/html
     networks:
@@ -26,7 +26,7 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: my_fuel_php_db
     ports:
-      - "3306:3306"
+      - '3306:3306'
     volumes:
       - db-data:/var/lib/mysql
     networks:
@@ -39,10 +39,9 @@ services:
       dockerfile: Dockerfile
     container_name: react-app
     ports:
-      - "5173:5173"
+      - '5173:5173'
     volumes:
       - ./frontend:/usr/src/app
-      - /usr/src/app/node_modules
     networks:
       - fuelphp-network
     command: pnpm run dev
