@@ -58,3 +58,15 @@ export const addScheduleAPI = async (scheduleData) => {
     body: JSON.stringify(scheduleData),
   });
 };
+
+/**
+ * 既存のスケジュールを更新する (PUT /api/schedules/{id})
+ */
+export const updateScheduleAPI = async (id, scheduleData) => {
+  // FuelPHPがJSONを受け取れるよう、Content-TypeとJSON.stringifyを使用
+  return await fetchApi(`${API_BASE_URL}/schedules/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(scheduleData),
+  });
+};
