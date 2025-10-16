@@ -176,10 +176,6 @@ class Model_User extends \Orm\Model
 	 */
 	public static function logout_user()
 	{
-		// ログイン状態チェック
-		if (!\Auth::check()) {
-			return false;
-		}
 
     // ------------------------------------------------------------------
     // 1. Authシステムのログアウト処理とリメンバーミーの無効化
