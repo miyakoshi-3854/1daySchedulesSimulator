@@ -46,3 +46,15 @@ export const loadSchedulesAPI = async (date) => {
   const url = `${API_BASE_URL}/schedules?date=${date}`;
   return await fetchApi(url);
 };
+
+/**
+ * 新しいスケジュールを登録する (POST /api/schedules)
+ */
+export const addScheduleAPI = async (scheduleData) => {
+  // FuelPHPがJSONを受け取れるよう、Content-TypeとJSON.stringifyを使用
+  return await fetchApi(`${API_BASE_URL}/schedules`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(scheduleData),
+  });
+};
