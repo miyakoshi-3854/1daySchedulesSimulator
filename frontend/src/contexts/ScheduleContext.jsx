@@ -79,6 +79,14 @@ export const ScheduleContextProvider = ({ children }) => {
     [isLoggedIn, logout]
   ); // 認証状態の変更で再作成
 
+  // カテゴリーデータをロードする関数 (初回のみ)
+  const loadCategories = useCallback(async () => {
+    const result = await scheduleService.loadCategoriesAPI();
+    if (result.success) {
+      setCategories(result.data);
+    }
+  }, []);
+
   // ------------------------------------------------------------------
   // 2. ライフサイクル/監視
   // ------------------------------------------------------------------
