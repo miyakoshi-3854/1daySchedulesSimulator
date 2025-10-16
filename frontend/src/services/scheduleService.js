@@ -37,3 +37,12 @@ export const loadHighlightDatesAPI = async (startDate, endDate) => {
   // { success: true, data: { highlight_dates: [...] } } の形式で返る
   return result;
 };
+
+/**
+ * 選択された日付の詳細なスケジュールリストを取得 (GET /api/schedules)
+ */
+export const loadSchedulesAPI = async (date) => {
+  // 日付のみでスケジュール一覧を取得
+  const url = `${API_BASE_URL}/schedules?date=${date}`;
+  return await fetchApi(url);
+};
