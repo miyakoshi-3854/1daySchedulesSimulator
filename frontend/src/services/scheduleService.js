@@ -79,3 +79,11 @@ export const deleteScheduleAPI = async (id) => {
     method: 'DELETE',
   });
 };
+
+/**
+ * 全カテゴリーリストを取得 (GET /api/categories)
+ */
+export const loadCategoriesAPI = async () => {
+  // カテゴリーAPIは認証不要だが、fetchApiを再利用
+  return await fetchApi(`${API_BASE_URL}/categories`);
+};
