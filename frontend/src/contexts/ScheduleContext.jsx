@@ -93,4 +93,11 @@ export const ScheduleContextProvider = ({ children }) => {
   useEffect(() => {
     loadCategories();
   }, [loadCategories]);
+
+  // ------------------------------------------------------------------
+  // 3. CRUD 公開関数
+  // ------------------------------------------------------------------
+
+  // CRUD操作後、スケジュールを再ロードするためのヘルパー
+  const reloadSchedules = () => loadScheduleData(currentDate);
 };
