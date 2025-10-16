@@ -127,4 +127,17 @@ export const ScheduleContextProvider = ({ children }) => {
     }
     return result;
   };
+
+  const value = {
+    schedules,
+    highlightDates,
+    categories,
+    isDataLoading,
+    addSchedule,
+    updateSchedule,
+    deleteSchedule,
+    reloadSchedules, // 外部からの手動リロード用
+  };
+
+  return <ScheduleContext value={value}>{children}</ScheduleContext>;
 };
