@@ -118,4 +118,13 @@ export const ScheduleContextProvider = ({ children }) => {
     }
     return result;
   };
+
+  // スケジュール削除
+  const deleteSchedule = async (id) => {
+    const result = await scheduleService.deleteScheduleAPI(id);
+    if (result.success) {
+      reloadSchedules();
+    }
+    return result;
+  };
 };
