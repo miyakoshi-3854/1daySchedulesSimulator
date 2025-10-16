@@ -13,7 +13,7 @@
   --color-text-dark: #484848;
 
   /* 背景色 (提供された情報に基づく) */
-  --color-background-ligth: #1c1c1c; /* 背景色1 (TimeGraphやアプリ全体のベース) */
+  --color-background-light: #1c1c1c; /* 背景色1 (TimeGraphやアプリ全体のベース) */
   --color-background-dark: #131313; /* 背景色2 (ScheduleList, Form, Modalの背景) */
 
   /* ボタンカラー */
@@ -33,7 +33,7 @@ body,
 html,
 #root {
   /* 最も広い背景には背景色1を適用 */
-  background-color: var(--color-background-ligth);
+  background-color: var(--color-background-light);
   color: var(--color-text-light);
 }
 
