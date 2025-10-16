@@ -109,4 +109,13 @@ export const ScheduleContextProvider = ({ children }) => {
     }
     return result;
   };
+
+  // スケジュール更新
+  const updateSchedule = async (id, data) => {
+    const result = await scheduleService.updateScheduleAPI(id, data);
+    if (result.success) {
+      reloadSchedules();
+    }
+    return result;
+  };
 };
