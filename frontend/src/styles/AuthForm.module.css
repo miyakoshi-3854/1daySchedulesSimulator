@@ -1,0 +1,73 @@
+/* AuthFormのスタイル */
+.authModal {
+  /* 背景色1（#1c1c1c）を適用し、コンテンツのサイズを制限 */
+  background-color: var(--color-background-light);
+  padding: 30px 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  width: 100%;
+  max-width: 380px; /* フォームの幅を制限 */
+}
+
+/* フォームタイトル (タブ全体) */
+.authTabs {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-text-dark);
+}
+
+.authTab {
+  cursor: pointer;
+  padding: 8px 0px;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  transition: color 0.2s, border-bottom 0.2s;
+  user-select: none; /* テキスト選択を防ぐ */
+  flex-grow: 1;
+  text-align: center;
+}
+
+/* 選択中のタブ */
+.authTab.active {
+  color: var(--color-text-light);
+  border-bottom: 3px solid var(--color-text-light);
+  margin-bottom: -1px; /* 下線が親要素と重なるように調整 */
+}
+
+/* フォームのラベルと入力フィールド */
+.authModal label {
+  display: block;
+  margin-top: 15px;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+  color: var(--color-text-light);
+}
+
+.authModal input {
+  width: 99%;
+  border: 1px solid #444;
+  border-radius: 4px;
+  background-color: #333;
+  color: var(--color-text-light);
+  font-size: 1em;
+}
+
+/* エラーメッセージ */
+.errorMessage {
+  color: var(--color-error);
+  text-align: center;
+  margin-top: 15px;
+}
+
+/* ボタン群の配置 */
+.formActions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 30px;
+  gap: 15px;
+}
+/* ボタンの幅を均等に */
+.formActions button {
+  flex-grow: 1;
+}

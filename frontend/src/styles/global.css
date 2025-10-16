@@ -1,3 +1,4 @@
+/* アプリケーション全体で使用するスタイル */
 :root {
   /* 1. タイポグラフィと基本設定 */
   --spacing-unit: 8px;
@@ -9,10 +10,11 @@
 
   /* 文字色 */
   --color-text-light: #eaeaea;
+  --color-text-dark: #484848;
 
   /* 背景色 (提供された情報に基づく) */
-  --color-background-app: #1c1c1c; /* 背景色1 (TimeGraphやアプリ全体のベース) */
-  --color-surface-card: #131313; /* 背景色2 (ScheduleList, Form, Modalの背景) */
+  --color-background-light: #1c1c1c; /* 背景色1 (TimeGraphやアプリ全体のベース) */
+  --color-background-dark: #131313; /* 背景色2 (ScheduleList, Form, Modalの背景) */
 
   /* ボタンカラー */
   --color-button-positive: #38b6ff; /* 肯定的なアクション (青) */
@@ -21,15 +23,30 @@
   /* ホバー時の暗いバージョン */
   --color-button-positive-dark: #2a8fc2;
   --color-button-negative-dark: #cc2727;
+
+  /* エラー時のカラー */
+  --color-error: #ff0000;
 }
 
 /* 3. body/htmlへのベーススタイルの適用 (global.css) */
 body,
 html,
 #root {
-  /* 最も広い背景には背景色2を適用 */
-  background-color: var(--color-background-app);
+  /* 最も広い背景には背景色1を適用 */
+  background-color: var(--color-background-light);
   color: var(--color-text-light);
+}
+
+.btn {
+  /* ★重要★ 角丸の適用と共通パディング */
+  padding: var(--spacing-unit) calc(var(--spacing-unit) * 1.5);
+  border: none;
+  border-radius: 4px; /* ★角丸を適用 */
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  font-size: 0.95em;
+  white-space: nowrap;
 }
 
 /* 4. 共通ボタンの再定義 (global.css) */
@@ -42,10 +59,26 @@ html,
 }
 
 /* 否定ボタンや「全削除」ボタン */
-.btn-danger {
+.btn-secondary {
   background-color: var(--color-button-negative);
   color: var(--color-text-light);
 }
-.btn-danger:hover {
+.btn-secondary:hover {
   background-color: var(--color-button-negative-dark);
+}
+
+/* --- モーダルオーバーレイ --- */
+.modal-overlay {
+  /* 画面全体を覆う */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* 暗転させる背景色 */
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center; /* 水平方向の中央揃え */
+  align-items: center; /* 垂直方向の中央揃え */
+  z-index: 1000; /* 最前面に表示 */
 }

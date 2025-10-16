@@ -9,6 +9,7 @@
  */
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import styles from '../styles/AuthForm.module.css';
 
 /**
  * ログインおよび新規登録フォームコンポーネント
@@ -86,18 +87,22 @@ export const AuthForm = ({ onClose }) => {
 
   // --- 3. レンダリング ---
   return (
-    <div className="auth-modal">
-      <form className="auth-form-content" onSubmit={handleSubmit} noValidate>
+    <div className={styles.authModal}>
+      <form
+        className={styles.authFormContent}
+        onSubmit={handleSubmit}
+        noValidate
+      >
         {/* タブ部分 (モード切り替えUI) */}
-        <div className="auth-tabs">
+        <div className={styles.authTabs}>
           <span
-            className={isLoginMode ? 'active' : 'inactive'}
+            className={`${styles.authTab} ${isLoginMode ? styles.active : ''}`}
             onClick={() => handleModeSwitch(true)}
           >
             ログイン
           </span>
           <span
-            className={!isLoginMode ? 'active' : 'inactive'}
+            className={`${styles.authTab} ${!isLoginMode ? styles.active : ''}`}
             onClick={() => handleModeSwitch(false)}
           >
             新規登録
@@ -105,15 +110,18 @@ export const AuthForm = ({ onClose }) => {
         </div>
 
         {/* エラーメッセージの表示 */}
-        {error && <p className="error-message">{error}</p>}
+        {error && <p className={styles.errorMessage}>{error}</p>}
 
         {/* ユーザー名 (新規登録時のみ表示) */}
         {!isLoginMode && (
           <>
-            <label htmlFor="username">ユーザー名</label>
+            <label htmlFor="username" className={styles.label}>
+              ユーザー名
+            </label>
             <input
               id="username"
               type="text"
+              className={styles.inputField}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               disabled={isSubmitting}
@@ -122,34 +130,44 @@ export const AuthForm = ({ onClose }) => {
         )}
 
         {/* Email 入力欄 */}
-        <label htmlFor="email">email</label>
+        <label htmlFor="email" className={styles.label}>
+          email
+        </label>
         <input
           id="email"
           type="email"
+          className={styles.inputField}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={isSubmitting}
         />
 
         {/* Password 入力欄 */}
-        <label htmlFor="password">password</label>
+        <label htmlFor="password" className={styles.label}>
+          password
+        </label>
         <input
           id="password"
           type="password"
+          className={styles.inputField}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           disabled={isSubmitting}
         />
 
         {/* ボタン群 (表示名をモードで切り替え) */}
-        <div className="form-actions">
-          <button type="submit" disabled={isSubmitting} className="btn-primary">
+        <div className={styles.formActions}>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="btn btn-primary"
+          >
             {isSubmitting ? '処理中...' : isLoginMode ? 'ログイン' : '登録'}
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="btn-secondary"
+            className="btn btn-secondary"
             disabled={isSubmitting}
           >
             閉じる
