@@ -87,3 +87,16 @@
 .btnMonthNavFull {
   font-size: 1.2em; /* 月変更ボタンを少し大きく */
 }
+
+.userInfo {
+  display: flex; /* 内部要素を横並びにし、gapを有効にする */
+  align-items: center;
+  gap: 16px; /* ★ユーザー名とボタンの間隔を確保 (8pxから増やす) */
+  padding-right: 8px; /* 認証UIエリアとの隙間を確保 */
+}
+
+/* ユーザー名のスタイルの調整 */
+.userInfo span {
+  font-weight: 500;
+  white-space: nowrap; /* 折り返しを防ぐ */
+}
