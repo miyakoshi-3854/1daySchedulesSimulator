@@ -100,4 +100,13 @@ export const ScheduleContextProvider = ({ children }) => {
 
   // CRUD操作後、スケジュールを再ロードするためのヘルパー
   const reloadSchedules = () => loadScheduleData(currentDate);
+
+  // スケジュール追加
+  const addSchedule = async (data) => {
+    const result = await scheduleService.addScheduleAPI(data);
+    if (result.success) {
+      reloadSchedules();
+    }
+    return result;
+  };
 };
