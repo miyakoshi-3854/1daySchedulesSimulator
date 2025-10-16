@@ -22,3 +22,18 @@ const fetchApi = async (url, options = {}) => {
   }
   return { success: true, data: data.data };
 };
+
+// ======================================================================
+// API通信関数
+// ======================================================================
+
+/**
+ * 選択された期間のハイライト日付リストを取得 (GET /api/schedules/dates)
+ */
+export const loadHighlightDatesAPI = async (startDate, endDate) => {
+  const url = `${API_BASE_URL}/schedules/dates?start_date=${startDate}&end_date=${endDate}`;
+  const result = await fetchApi(url);
+
+  // { success: true, data: { highlight_dates: [...] } } の形式で返る
+  return result;
+};
