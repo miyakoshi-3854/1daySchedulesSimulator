@@ -70,3 +70,12 @@ export const updateScheduleAPI = async (id, scheduleData) => {
     body: JSON.stringify(scheduleData),
   });
 };
+
+/**
+ * スケジュールを削除する (DELETE /api/schedules/{id})
+ */
+export const deleteScheduleAPI = async (id) => {
+  return await fetchApi(`${API_BASE_URL}/schedules/${id}`, {
+    method: 'DELETE',
+  });
+};
