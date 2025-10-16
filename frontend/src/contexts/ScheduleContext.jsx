@@ -3,8 +3,8 @@
  *
  * 目的：
  * 1. 認証状態と日付状態の両方を監視し、データロードをトリガーします。
- * 2. ログイン済みの場合のみ API を叩くようにします。
- * 3. データの取得が完了した後、CRUD操作が実行されます。
+ * 2. ログイン済みの場合のみ API を叩くようにし、セキュリティと効率を確保します。
+ * 3. データの取得が完了した後、CRUD操作の結果に応じてデータを自動で再ロードします。
  */
 import {
   createContext,
@@ -21,6 +21,9 @@ const ScheduleContext = createContext(null);
 
 export const useSchedule = () => useContext(ScheduleContext);
 
+/*
+ * スケジュールデータとCRUDロジックを提供するプロバイダーコンポーネント
+ */
 export const ScheduleContextProvider = ({ children }) => {
   const { isLoggedIn, logout, user } = useAuth(); // 認証コンテキスト
   const { currentDate, changeMonth } = useDate(); // 日付コンテキスト
@@ -42,7 +45,7 @@ export const ScheduleContextProvider = ({ children }) => {
     async (date) => {
       if (!isLoggedIn) return; // 未ログイン時はロードしない
 
-      setIsDataLoading(true);
+      setIsDataLoading(true); // ロード開始
 
       // 1. 詳細スケジュールをロード
       const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 形式
@@ -71,19 +74,21 @@ export const ScheduleContextProvider = ({ children }) => {
         endOfMonth
       );
       if (highlightResult.success) {
+        // ハイライト日付リストを更新
         setHighlightDates(highlightResult.data.highlight_dates || []);
       }
 
-      setIsDataLoading(false);
+      setIsDataLoading(false); // ロード終了
     },
     [isLoggedIn, logout]
   ); // 認証状態の変更で再作成
 
   // カテゴリーデータをロードする関数 (初回のみ)
+  // useCallbackでメモ化し、useEffectの依存配列に入れることで関数の安定性を確保
   const loadCategories = useCallback(async () => {
     const result = await scheduleService.loadCategoriesAPI();
     if (result.success) {
-      setCategories(result.data);
+      setCategories(result.data); // カテゴリーデータを状態にセット
     }
   }, []);
 
@@ -136,6 +141,7 @@ export const ScheduleContextProvider = ({ children }) => {
     return result;
   };
 
+  // Contextを通じて提供する全ての状態と関数をまとめたオブジェクト
   const value = {
     schedules,
     highlightDates,
