@@ -23,6 +23,9 @@
   /* ホバー時の暗いバージョン */
   --color-button-positive-dark: #2a8fc2;
   --color-button-negative-dark: #cc2727;
+
+  /* エラー時のカラー */
+  --color-error: #ff0000;
 }
 
 /* 3. body/htmlへのベーススタイルの適用 (global.css) */
