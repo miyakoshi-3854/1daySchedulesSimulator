@@ -78,4 +78,19 @@ export const ScheduleContextProvider = ({ children }) => {
     },
     [isLoggedIn, logout]
   ); // 認証状態の変更で再作成
+
+  // ------------------------------------------------------------------
+  // 2. ライフサイクル/監視
+  // ------------------------------------------------------------------
+
+  // 【監視】日付、認証状態の変更を監視し、スケジュールデータをリロード
+  useEffect(() => {
+    // currentDate が変更されるたび、またはログイン状態が true になるたびにロード
+    loadScheduleData(currentDate);
+  }, [currentDate, isLoggedIn, loadScheduleData]);
+
+  // 【初回ロード】カテゴリーデータのロード
+  useEffect(() => {
+    loadCategories();
+  }, [loadCategories]);
 };
