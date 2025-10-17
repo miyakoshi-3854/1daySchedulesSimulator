@@ -4,11 +4,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between; /* 要素を左右と中央に分ける */
-
   padding: 16px 24px; /* 上下左右のパディング */
-  background-color: var(
-    --color-surface
-  ); /* styles/_variables.css の変数を想定 */
   position: relative; /* 中央配置の日付エリアの基準 */
   width: 100%;
   box-sizing: border-box;
@@ -54,6 +50,11 @@
 /* 5. ロゴと認証エリアが中央の要素と重なっても縮まないように */
 .logo {
   flex-shrink: 0;
+  width: 300px;
+  white-space: nowrap;
+  font-weight: bold;
+  font-size: 1.4em;
+  align-items: center;
 }
 
 /* 6. 個別要素のスタイリング (任意) */
@@ -67,7 +68,9 @@
 /* 日付操作ボタンの共通スタイル */
 .btnToday,
 .btnDayNav,
-.btnMonthNavFull {
+.btnMonthNavFull,
+.btnLogout,
+.btnLoginRegister {
   /* グローバルCSSの .btn を継承することを想定 */
   background: none;
   border: none;
@@ -80,7 +83,9 @@
 
 .btnToday:hover,
 .btnDayNav:hover,
-.btnMonthNavFull:hover {
+.btnMonthNavFull:hover,
+.btnLogout:hover,
+.btnLoginRegister:hover {
   background-color: rgba(255, 255, 255, 0.1);
 }
 
