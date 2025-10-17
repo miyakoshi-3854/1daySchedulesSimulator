@@ -6,7 +6,7 @@
  * 2. 日付を操作するための統一された関数（日、月の変更など）を提供する。
  * 3. コンポーネントツリーのどの場所からでも、これらの状態と関数に簡単にアクセスできるようにする。
  */
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 
 // DateContextは、日付の状態を格納するためのコンテナとして機能します。
 // これにより、コンポーネント間でpropsのバケツリレーをせずに済みます。
@@ -59,6 +59,14 @@ export const DateContextProvider = ({ children }) => {
     setCurrentDate(newDate);
   };
 
+  /*
+   * Dateオブジェクトを直接受け取り、currentDateを更新する関数
+   */
+  const setTargetDate = useCallback((dateObject) => {
+    // 新しいDateオブジェクトで状態を更新
+    setCurrentDate(dateObject);
+  }, []);
+
   // Contextに提供するすべての状態と関数を一つのオブジェクトにまとめます。
   // これにより、利用する側は必要なものだけを分割代入で取り出せます。
   const value = {
@@ -66,6 +74,7 @@ export const DateContextProvider = ({ children }) => {
     goToToday,
     changeDay,
     changeMonth,
+    setTargetDate,
     // 頻繁に使用される操作のための便利なラッパー関数。
     goToPrevDay: () => changeDay(-1),
     goToNextDay: () => changeDay(1),
