@@ -7,6 +7,7 @@
  * 3. コンポーネントツリーのどの場所からでも、これらの状態と関数に簡単にアクセスできるようにする。
  */
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { startOfDay } from '../utils/dateUtils';
 
 // DateContextは、日付の状態を格納するためのコンテナとして機能します。
 // これにより、コンポーネント間でpropsのバケツリレーをせずに済みます。
@@ -24,7 +25,7 @@ export const DateContextProvider = ({ children }) => {
   /*
    *現在の日付に状態をリセットする関数。
    */
-  const goToToday = () => setCurrentDate(new Date());
+  const goToToday = () => setCurrentDate(startOfDay(new Date()));
 
   /*
    * 指定された日数だけ日付を変更する関数。
@@ -33,7 +34,7 @@ export const DateContextProvider = ({ children }) => {
     // 状態を直接変更しないように、新しい日付オブジェクトを作成します。
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + days);
-    setCurrentDate(newDate);
+    setCurrentDate(startOfDay(newDate));
   };
 
   /*
@@ -56,7 +57,7 @@ export const DateContextProvider = ({ children }) => {
       newDate.setDate(0);
     }
 
-    setCurrentDate(newDate);
+    setCurrentDate(startOfDay(newDate));
   };
 
   /*
@@ -64,7 +65,7 @@ export const DateContextProvider = ({ children }) => {
    */
   const setTargetDate = useCallback((dateObject) => {
     // 新しいDateオブジェクトで状態を更新
-    setCurrentDate(dateObject);
+    setCurrentDate(startOfDay(dateObject));
   }, []);
 
   // Contextに提供するすべての状態と関数を一つのオブジェクトにまとめます。
