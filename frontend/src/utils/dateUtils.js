@@ -5,9 +5,16 @@
  * @returns {string} 'YYYY-MM-DD' 形式の文字列
  */
 export const formatDate = (date) => {
-  // タイムゾーンの問題を回避するため、getTimezoneOffsetを考慮したUTC変換を使わずに
-  // ISO文字列から日付部分のみを取り出す方法を採用します。
-  return date.toISOString().split('T')[0];
+  // YYYY-MM-DD形式に変換 (ISO文字列から日付部分を抜き取る)
+  // ただし、この方法だと、dateがUTC midnightの場合、ローカルタイムゾーンによっては前日になってしまう可能性がある
+  // 例: JSTの場合 2025-10-18T00:00:00Z は 2025-10-17 09:00:00 JST
+  // なので、代わりに手動で現地の日付を構築する方法を使う。
+
+  // YYYY-MM-DD の現地時刻を返す新しいヘルパー
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 /**
