@@ -1,0 +1,87 @@
+.calendarContainer {
+  width: 100%;
+  max-width: 300px; /* UIイメージに合わせて幅を制限 */
+  padding: 0 24px; /* 24px */
+  border-radius: 8px;
+  font-family: var(--font-stack);
+  color: var(--color-text-light);
+}
+
+/* ヘッダー: 年月と月切り替えボタンの配置 */
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-unit) * 2;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+/* 日付グリッド: 7列レイアウト */
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 均等な7列 */
+  text-align: center;
+  font-size: 0.85em;
+}
+
+/* 曜日表示 */
+.weekday {
+  padding: var(--spacing-unit);
+  color: var(--color-text-dark); /* 薄い色 */
+  font-weight: 500;
+}
+
+/* 日付セル */
+.dayCell {
+  padding: var(--spacing-unit);
+  width: 25px;
+  height: 25px; /* 正方形に近い形を維持 */
+  cursor: pointer;
+  border-radius: 50%; /* ホバーや選択時に円形に */
+  transition: background-color 0.1s;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dayCell:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 非当月の日付を薄く表示 */
+.otherMonth {
+  color: var(--color-text-dark);
+}
+
+/* スケジュールありのハイライト (水色) */
+.highlighted {
+  background-color: rgba(56, 182, 255, 0.3); /* ★透明度のある水色 */
+  color: var(--color-text-light);
+  margin: 0 auto;
+}
+
+/* 選択されている日付 (白色背景) */
+.selected {
+  background-color: var(--color-text-light); /* 白背景 */
+  color: var(--color-background-dark); /* 濃い文字色 */
+  font-weight: bold;
+  margin: 0 auto;
+}
+
+.btnMonthNav {
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  cursor: pointer;
+  padding: 8px;
+  margin: 8px;
+  border-radius: 4px;
+  font-size: 1.2em;
+  transition: background-color 0.1s;
+}
+
+.btnMonthNav:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
