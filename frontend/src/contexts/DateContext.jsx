@@ -20,7 +20,7 @@ const DateContext = createContext();
  */
 export const DateContextProvider = ({ children }) => {
   // useStateフックを使って、現在の日付を状態として管理します。
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(startOfDay(new Date()));
 
   /*
    *現在の日付に状態をリセットする関数。
