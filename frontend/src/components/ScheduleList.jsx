@@ -6,7 +6,6 @@
  * 1. 選択している日付のスケジュール一覧を表示する。
  * 2. スケジュールを編集、削除する導線になる。
  */
-import { useDate } from '../contexts/DateContext';
 import { useSchedule } from '../contexts/ScheduleContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useConfirmModal } from '../hooks/useConfirmModal'; // ★カスタムフックをインポート
@@ -17,7 +16,6 @@ export const ScheduleList = () => {
   // 1. Contextからデータと状態を取得
   const { schedules, isDataLoading, deleteSchedule, deleteAllSchedules } =
     useSchedule();
-  const { formattedDate } = useDate();
   const { isLoggedIn } = useAuth();
 
   // 2. カスタムフックからモーダル制御を取得
