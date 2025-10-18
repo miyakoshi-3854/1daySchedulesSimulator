@@ -16,6 +16,7 @@ import {
 import { useAuth } from './AuthContext'; // 認証状態
 import { useDate } from './DateContext'; // 日付情報
 import * as scheduleService from '../services/scheduleService'; // サービス
+import { formatDate } from '../utils/dateUtils';
 
 const ScheduleContext = createContext(null);
 
@@ -25,8 +26,8 @@ export const useSchedule = () => useContext(ScheduleContext);
  * スケジュールデータとCRUDロジックを提供するプロバイダーコンポーネント
  */
 export const ScheduleContextProvider = ({ children }) => {
-  const { isLoggedIn, logout, user } = useAuth(); // 認証コンテキスト
-  const { currentDate, changeMonth } = useDate(); // 日付コンテキスト
+  const { isLoggedIn, logout } = useAuth(); // 認証コンテキスト
+  const { currentDate } = useDate(); // 日付コンテキスト
 
   // スケジュールデータ
   const [schedules, setSchedules] = useState([]);
@@ -48,7 +49,7 @@ export const ScheduleContextProvider = ({ children }) => {
       setIsDataLoading(true); // ロード開始
 
       // 1. 詳細スケジュールをロード
-      const formattedDate = date.toISOString().split('T')[0]; // YYYY-MM-DD 形式
+      const formattedDate = formatDate(date); // YYYY-MM-DD 形式
       const scheduleResult = await scheduleService.loadSchedulesAPI(
         formattedDate
       );
@@ -62,16 +63,15 @@ export const ScheduleContextProvider = ({ children }) => {
 
       // 2. ハイライト日付をロード (カレンダーUI用)
       // ここでは、現在表示されている月のハイライトを取得する必要がある
-      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1)
-        .toISOString()
-        .split('T')[0];
-      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0)
-        .toISOString()
-        .split('T')[0];
+      const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+
+      const startOfMonthStr = formatDate(startOfMonth);
+      const endOfMonthStr = formatDate(endOfMonth);
 
       const highlightResult = await scheduleService.loadHighlightDatesAPI(
-        startOfMonth,
-        endOfMonth
+        startOfMonthStr,
+        endOfMonthStr
       );
       if (highlightResult.success) {
         // ハイライト日付リストを更新
@@ -141,6 +141,50 @@ export const ScheduleContextProvider = ({ children }) => {
     return result;
   };
 
+  /**
+   * 【新規実装】読み込み中の日付のスケジュールを全て削除する
+   */
+  const deleteAllSchedules = async () => {
+    // 現在読み込まれているスケジュールデータを使用
+    const schedulesToDelete = schedules || [];
+
+    if (schedulesToDelete.length === 0) {
+      console.log('削除対象のスケジュールはありません。');
+      return { success: true };
+    }
+
+    // 削除処理の実行
+    try {
+      const deletePromises = schedulesToDelete.map((schedule) =>
+        // 個別の削除関数 (deleteSchedule) を並列実行 (Promise.all)
+        deleteSchedule(schedule.id)
+      );
+
+      const results = await Promise.all(deletePromises);
+
+      // 全て成功したかチェック（ここでは単純にPromise.allの成功で判断）
+      const allSuccess = results.every((result) => result && result.success);
+
+      if (allSuccess) {
+        // 削除が完了したら、カレンダーデータを再読み込み
+        reloadSchedules(); // reloadSchedules() は getSchedules を再度実行する関数と仮定
+        return { success: true };
+      } else {
+        // 一部失敗した場合の処理
+        return {
+          success: false,
+          message: '一部のスケジュールの削除に失敗しました。',
+        };
+      }
+    } catch (error) {
+      console.error('一括削除中にエラーが発生しました:', error);
+      return {
+        success: false,
+        message: 'サーバーエラーにより一括削除が完了できませんでした。',
+      };
+    }
+  };
+
   // Contextを通じて提供する全ての状態と関数をまとめたオブジェクト
   const value = {
     schedules,
@@ -150,6 +194,7 @@ export const ScheduleContextProvider = ({ children }) => {
     addSchedule,
     updateSchedule,
     deleteSchedule,
+    deleteAllSchedules,
     reloadSchedules, // 外部からの手動リロード用
   };
 
