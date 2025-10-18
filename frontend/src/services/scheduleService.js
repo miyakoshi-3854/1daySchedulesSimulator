@@ -11,7 +11,16 @@ const fetchApi = async (url, options = {}) => {
     ...options,
     credentials: 'include', // 認証Cookie必須
   });
-  const data = await response.json();
+  // HTTPステータスが 204 No Content の場合は JSON パースをスキップ
+  const isNoContent = response.status === 204;
+
+  // 応答ボディがある場合のみ JSON をパース
+  const data = isNoContent ? null : await response.json();
+
+  // 204 No Content (削除成功) は、データなしで成功を返す
+  if (isNoContent) {
+    return { success: true, data: null };
+  }
 
   // エラーハンドリング: 400, 401, 500 などをチェック
   if (!response.ok || data.status === 'error') {
