@@ -1,0 +1,129 @@
+.scheduleListContainer {
+  /* モーダルと同じ背景色（#1c1c1c）を適用 */
+  background-color: var(--color-background-light);
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  /* UIイメージに合わせて幅を固定/制限 */
+  width: 320px;
+}
+
+/* 予定一覧ヘッダー */
+.header {
+  border-bottom: 1px solid #444;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  font-family: var(--font-stack);
+}
+
+.title {
+  font-size: 1.4em;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-light);
+}
+
+/* 予定名 開始〜終了 の表示行 */
+.titleRow {
+  display: flex;
+  gap: 10px;
+  font-size: 0.85em;
+  color: var(--color-text-light);
+  margin-bottom: 8px;
+}
+
+/* リストアイテム */
+.scheduleItem {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-stack);
+  padding: 10px 0;
+  border-bottom: 1px solid #333; /* アイテム間の区切り線 */
+}
+
+.scheduleItem:last-child {
+  border-bottom: none; /* 最後の要素の下線を削除 */
+}
+
+/* 色マーカー (丸) */
+.colorMarker {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+/* 予定名と時間の詳細エリア */
+.details {
+  flex-grow: 1; /* 残りのスペースを占有 */
+  display: flex;
+  flex-direction: column;
+  font-size: 0.95em;
+}
+
+.scheduleTime {
+  color: var(--color-text-secondary);
+  font-size: 0.85em;
+}
+
+/* 編集・削除ボタンのグループ */
+.actions {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+/* 個別ボタンのスタイル（グローバルクラスを継承することを想定） */
+.actions button {
+  /* グローバルで btn クラスを継承し、サイズとフォントを調整 */
+  padding: 4px 8px;
+  font-size: 0.8em;
+}
+
+.btnEdit {
+  background-color: var(--color-button-positive);
+  color: var(--color-text-light);
+}
+
+.btnDelete {
+  background-color: var(--color-button-negative);
+  color: var(--color-text-light);
+}
+
+/* 予定追加ボタンのコンテナとボタン */
+.listActions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 15px;
+  margin-top: 15px;
+  border-top: 1px solid #444; /* リストとアクションエリアの区切り線 */
+}
+
+/* 予定追加ボタン */
+.btnAddSchedule {
+  width: 100%;
+  background: var(--color-button-positive);
+  padding: 10px;
+  font-weight: bold;
+  color: var(--color-text-light);
+}
+
+/* 全て削除ボタン */
+.btnDeleteAll {
+  width: 100%;
+  padding: 8px;
+  font-size: 1.1em;
+  font-weight: bold;
+  background-color: var(--color-button-negative);
+  color: var(--color-text-light);
+}
+
+/* その他ローディング/データなし表示 */
+.noData,
+.loading {
+  padding: 20px 0;
+  text-align: center;
+  color: var(--color-text-secondary);
+}
