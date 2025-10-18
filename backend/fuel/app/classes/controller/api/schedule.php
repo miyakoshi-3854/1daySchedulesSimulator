@@ -5,6 +5,12 @@ use Fuel\Core\Validation;
 
 class Controller_Api_Schedule extends Controller_Base_Api
 {
+  public function options_index()
+  {
+    // 処理は base/api.php の before() で既に実装済みのため、
+    // ここでは FuelPHP のルーティングにヒットさせる役割のみを担う
+  }
+  
   // 全メソッドで認証が必要
   protected $require_auth = true;
 
