@@ -26,8 +26,8 @@ export const useSchedule = () => useContext(ScheduleContext);
  * スケジュールデータとCRUDロジックを提供するプロバイダーコンポーネント
  */
 export const ScheduleContextProvider = ({ children }) => {
-  const { isLoggedIn, logout, user } = useAuth(); // 認証コンテキスト
-  const { currentDate, changeMonth } = useDate(); // 日付コンテキスト
+  const { isLoggedIn, logout } = useAuth(); // 認証コンテキスト
+  const { currentDate } = useDate(); // 日付コンテキスト
 
   // スケジュールデータ
   const [schedules, setSchedules] = useState([]);
