@@ -1,0 +1,46 @@
+/* src/styles/ConfirmModal.module.css */
+
+/* 1. モーダル本体のコンテナ */
+.modalContent {
+  /* AuthFormと同じ surface-card の色を適用 */
+  background-color: var(--color-background-light);
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+  width: 100%;
+  max-width: 400px; /* 小さめに設定 */
+  text-align: center;
+}
+
+/* 2. 確認メッセージのスタイル */
+.message {
+  font-size: 1.1em;
+  font-weight: 500;
+  color: var(--color-text-light);
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+/* 3. ボタン群のスタイル */
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+/* 4. ボタンの継承と修正 */
+/* グローバルCSSで定義した .btn-secondary と .btn-danger を利用します */
+
+/* キャンセルボタン */
+.actions .btn-secondary {
+  /* 共通スタイルを使用 */
+  flex-grow: 1;
+}
+
+/* 確定ボタン（削除ボタン） */
+/* .btn-primary または .btn-danger クラスが直接適用されるため、ここではレイアウトのみ */
+.actions button {
+  padding: 10px 20px;
+  font-weight: 600;
+  flex-grow: 1;
+}
