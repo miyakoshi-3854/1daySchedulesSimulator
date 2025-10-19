@@ -5,7 +5,7 @@ import { Header } from '../components/Header';
 import { Calendar } from '../components/Calendar';
 // import TimeGraph from '../components/TimeGraph';
 import { ScheduleList } from '../components/ScheduleList';
-// import ScheduleForm from '../components/ScheduleForm';
+import { ScheduleForm } from '../components/ScheduleForm';
 
 export default function DashBoard() {
   return (
@@ -16,7 +16,7 @@ export default function DashBoard() {
           <Calendar />
           {/* <TimeGraph /> */}
           <ScheduleList />
-          {/* <ScheduleForm /> */}
+          <ScheduleForm />
         </ScheduleContextProvider>
       </DateContextProvider>
     </AuthContextProvider>
