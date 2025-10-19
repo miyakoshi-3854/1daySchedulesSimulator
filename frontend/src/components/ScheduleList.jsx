@@ -14,8 +14,14 @@ import styles from '../styles/ScheduleList.module.css';
 
 export const ScheduleList = () => {
   // 1. Contextからデータと状態を取得
-  const { schedules, isDataLoading, deleteSchedule, deleteAllSchedules } =
-    useSchedule();
+  const {
+    schedules,
+    isDataLoading,
+    deleteSchedule,
+    deleteAllSchedules,
+    startAdd,
+    startEdit,
+  } = useSchedule();
   const { isLoggedIn } = useAuth();
 
   // 2. カスタムフックからモーダル制御を取得
@@ -86,7 +92,7 @@ export const ScheduleList = () => {
                   <button
                     className={`btn ${styles.btnEdit}`}
                     onClick={() => {
-                      /* 編集モーダルを開くロジック */
+                      startEdit(schedule);
                     }}
                   >
                     編集
@@ -107,10 +113,10 @@ export const ScheduleList = () => {
       {/* 予定追加ボタン (ScheduleForm コンポーネントへの導線) */}
       {isLoggedIn && (
         <div className={styles.listActions}>
-          {' '}
-          {/* 新しいコンテナを追加 */}
           {/* 予定追加+ ボタン */}
-          <button className={`btn ${styles.btnAddSchedule}`}>予定追加 +</button>
+          <button className={`btn ${styles.btnAddSchedule}`} onClick={startAdd}>
+            予定追加 +
+          </button>
           {/* 全て削除 ボタン */}
           <button
             className={`btn ${styles.btnDeleteAll}`}
