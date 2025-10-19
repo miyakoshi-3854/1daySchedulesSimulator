@@ -12,6 +12,7 @@ import {
   useState,
   useEffect,
   useCallback,
+  useMemo,
 } from 'react';
 import { useAuth } from './AuthContext'; // 認証状態
 import { useDate } from './DateContext'; // 日付情報
@@ -36,6 +37,9 @@ export const ScheduleContextProvider = ({ children }) => {
   // カテゴリーデータ (フォーム用)
   const [categories, setCategories] = useState([]);
   const [isDataLoading, setIsDataLoading] = useState(false);
+  // 編集・新規登録の状態管理
+  const [editingSchedule, setEditingSchedule] = useState(null);
+  const [isAddingNew, setIsAddingNew] = useState(false);
 
   // ------------------------------------------------------------------
   // 1. API データロード関数
@@ -185,18 +189,66 @@ export const ScheduleContextProvider = ({ children }) => {
     }
   };
 
-  // Contextを通じて提供する全ての状態と関数をまとめたオブジェクト
-  const value = {
-    schedules,
-    highlightDates,
-    categories,
-    isDataLoading,
-    addSchedule,
-    updateSchedule,
-    deleteSchedule,
-    deleteAllSchedules,
-    reloadSchedules, // 外部からの手動リロード用
+  // ------------------------------------------------------------------
+  // ★追加: 編集・新規追加モードの制御関数
+  // ------------------------------------------------------------------
+
+  // 【編集開始】ScheduleListやTimeGraphが呼び出す
+  const startEdit = (schedule) => {
+    setEditingSchedule(schedule);
+    setIsAddingNew(false); // 編集開始時は新規追加モードをオフ
   };
+
+  // 【新規開始】ScheduleListの「予定追加+」ボタンが呼び出す
+  const startAdd = () => {
+    setEditingSchedule(null); // 編集データはリセット
+    setIsAddingNew(true); // 新規追加モードをオン
+  };
+
+  // 【フォーム完了/キャンセル】ScheduleFormが呼び出す
+  const endForm = () => {
+    setEditingSchedule(null); // 編集データをリセット
+    setIsAddingNew(false); // 新規追加モードをオフ
+  };
+
+  // Contextを通じて提供する全ての状態と関数をまとめたオブジェクト
+  const value = useMemo(
+    () => ({
+      schedules,
+      highlightDates,
+      categories,
+      isDataLoading,
+      addSchedule,
+      updateSchedule,
+      deleteSchedule,
+      deleteAllSchedules,
+      reloadSchedules,
+      editingSchedule, // 現在編集中のデータ (null または Scheduleオブジェクト)
+      isAddingNew, // 新規追加モードかどうか (boolean)
+      startEdit, // 編集開始トリガー
+      startAdd, // 新規開始トリガー
+      endForm, // フォーム終了トリガー
+    }),
+    // ★依存配列の修正★: Stateと関数を含める
+    [
+      schedules,
+      highlightDates,
+      categories,
+      isDataLoading,
+      editingSchedule,
+      isAddingNew,
+      // 関数は useCallback でラップされているため、依存配列に入れる必要はないが、
+      // 厳密に全ての依存関係を列挙するのがベストプラクティス
+      addSchedule,
+      updateSchedule,
+      deleteSchedule,
+      deleteAllSchedules,
+      reloadSchedules,
+      startEdit,
+      startAdd,
+      endForm,
+    ]
+  );
 
   return <ScheduleContext value={value}>{children}</ScheduleContext>;
 };
