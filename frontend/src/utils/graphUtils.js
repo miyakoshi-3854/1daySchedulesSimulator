@@ -80,7 +80,7 @@ export const prepareGraphData = (schedules) => {
     // a. 未予定時間 (前の予定の終わり or 0:00 から現在の予定の開始まで)
     if (startTime > currentTimeAngle) {
       graphData.push({
-        color: '#444444', // 灰色の休憩時間
+        color: '#1c1c1c', // 灰色の休憩時間
         value: startTime - currentTimeAngle,
         data: {
           title: '未予定時間',
