@@ -1,0 +1,14 @@
+.timeGraphContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* タイトルなどを中央に */
+
+  font-family: var(--font-stack);
+
+  /* TimeGraphはアプリケーションの中央に配置され、背景はアプリのベース背景色 */
+  padding: 20px;
+
+  /* グラフの幅を確保 */
+  width: 500px;
+  height: 550px;
+}
