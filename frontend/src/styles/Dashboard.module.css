@@ -1,0 +1,39 @@
+/* 1. メインコンテンツエリアのレイアウト (Headerの下の領域) */
+.mainContent {
+  display: grid;
+  /* 3つのカラムを定義: 左側(狭)、中央(広)、右側(狭) */
+  grid-template-columns: 320px 1fr 320px;
+  gap: 30px; /* カラム間の間隔 */
+  padding: 20px 40px; /* アプリの端からのパディング */
+  height: 100%; /* 画面の高さ - Headerの高さ */
+  box-sizing: border-box;
+  background-color: var(--color-background-dark);
+  border-radius: 30px;
+  /* 中央のグラフとカレンダーを垂直方向中央に寄せる */
+  align-items: flex-start; /* 要素を上揃えにする */
+}
+
+/* 2. 左カラム: カレンダーとその削除ボタン */
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* カレンダーと削除ボタンの間隔 */
+  padding-top: 20px;
+}
+
+/* 3. 中央カラム: タイムグラフ */
+.centerColumn {
+  /* グラフを中央に寄せるためのFlexコンテナ */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 10px; /* Headerとグラフの間に隙間 */
+}
+
+/* 4. 右カラム: リストとフォーム */
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* リストとフォームの間隔 */
+  padding-top: 40px;
+}
