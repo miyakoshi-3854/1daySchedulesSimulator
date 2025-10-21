@@ -85,14 +85,14 @@ export const ScheduleForm = () => {
       const end = parseTime(editingSchedule.end_time);
 
       setFormData({
-        title: editingSchedule.title,
+        title: editingSchedule.title || '',
         category_id: editingSchedule.category_id || '',
         start_hour: start.hour,
         start_minute: start.minute,
         end_hour: end.hour,
         end_minute: end.minute,
         note: editingSchedule.note || '',
-        color: editingSchedule.color,
+        color: editingSchedule.color || '',
         fixed_date: editingSchedule.date,
       });
     } else if (isAddingNew) {
