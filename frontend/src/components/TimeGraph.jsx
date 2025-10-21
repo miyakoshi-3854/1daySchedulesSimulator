@@ -149,6 +149,7 @@ export const TimeGraph = () => {
       .attr('text-anchor', 'middle')
       .style('fill', '#eaeaea')
       .style('font-size', '12px')
+      .style('pointer-events', 'none')
       .text((d) => {
         // スケジュールデータへのアクセスをシンプルに：d.data.data を使用
         const schedule = d.data.data;
