@@ -3,7 +3,8 @@
   background-color: var(--color-background-light);
   border-radius: 8px;
   padding: 24px;
-  width: 320px; /* ScheduleList と幅を統一 */
+  width: 100%;
+  box-sizing: border-box;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   margin-top: 20px; /* Listとの間に隙間 */
   font-family: var(--font-stack);

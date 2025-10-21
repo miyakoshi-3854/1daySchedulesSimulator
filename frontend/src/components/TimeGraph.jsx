@@ -13,10 +13,10 @@ import { timeToAngle, prepareGraphData, wrap } from '../utils/graphUtils'; // an
 import styles from '../styles/TimeGraph.module.css';
 
 // グラフの定数
-const WIDTH = 500;
-const HEIGHT = 500;
-const INNER_RADIUS = 5;
-const OUTER_RADIUS = 200;
+const WIDTH = 700;
+const HEIGHT = 700;
+const INNER_RADIUS = 20;
+const OUTER_RADIUS = 300;
 const GRAPH_CENTER = { x: WIDTH / 2, y: HEIGHT / 2 };
 const PI = Math.PI;
 const START_ANGLE_OFFSET = 0;
