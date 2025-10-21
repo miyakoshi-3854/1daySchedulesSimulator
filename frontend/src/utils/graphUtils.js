@@ -64,18 +64,32 @@ export const angleToTime = (angle) => {
  * @returns {Array<object>} D3.js の pie layout が扱う {value, color, data} 形式
  */
 export const prepareGraphData = (schedules) => {
-  if (!Array.isArray(schedules) || schedules.length === 0) return [];
+  if (!Array.isArray(schedules) || schedules.length === 0) {
+    // スケジュールがない場合は、0:00から24:00までの未予定時間セグメントを1つだけ返す
+    return [
+      {
+        color: '#1c1c1c',
+        value: 360, // 360度全体
+        data: {
+          title: '未予定時間',
+          id: 'idle-0',
+          isIdle: true,
+        },
+      },
+    ];
+  }
 
   // 0. スケジュールデータを時刻でソート
   schedules.sort((a, b) => a.start_time.localeCompare(b.start_time));
 
   let graphData = [];
   let currentTimeAngle = 0; // 0:00 (0度) から開始
+  const DEGREES_PER_MINUTE = 360 / (24 * 60); // 1分あたりの角度
 
   // 1. スケジュールとスケジュール間の隙間を処理
   schedules.forEach((schedule) => {
     const startTime = timeToAngle(schedule.start_time);
-    const endTime = timeToAngle(schedule.end_time);
+    let endTime = timeToAngle(schedule.end_time);
 
     // a. 未予定時間 (前の予定の終わり or 0:00 から現在の予定の開始まで)
     if (startTime > currentTimeAngle) {
@@ -93,9 +107,10 @@ export const prepareGraphData = (schedules) => {
     // b. スケジュール本体
     let angleDifference = endTime - startTime;
 
-    // 23:55の視覚的調整 (endTimeを360度まで延長)
+    // 23:55 の視覚的調整: 23:55で終わる予定の場合、角度を360度まで延長
     if (schedule.end_time.startsWith('23:55')) {
-      angleDifference += 5 * DEGREES_PER_MINUTE; // 1.25度分追加
+      angleDifference = 360 - startTime;
+      endTime = 360; // endTime も 360 度として扱う
     }
 
     graphData.push({
@@ -104,26 +119,20 @@ export const prepareGraphData = (schedules) => {
       data: schedule,
     });
 
-    currentTimeAngle = endTime; // 現在時刻をこの予定の終了角度まで進める
+    // 23:55 調整が入った場合、currentTimeAngle は 360 になります。
+    currentTimeAngle = endTime;
   });
-
-  // 最後に処理された時刻が 23:55:00 を超えているかチェック
-  // 23:55 の視覚調整を行った場合、currentTimeAngle は 360 を超えるはず
-  const angleFor2355 = timeToAngle('23:55:00'); // 358.75度
-
-  // 【★修正点1★】最後のセグメントが 23:55 で終わっていた場合、currentTimeAngleを調整
-  // 23:55 で終わる予定に遭遇した場合、currentTimeAngle が 360度を超えてしまうのを防ぐ
-  if (currentTimeAngle >= angleFor2355) {
-    // 描画上は360度まで到達したと見なし、残りの休憩時間を計算しないようにする
-    currentTimeAngle = 360;
-  }
 
   // 2. 最終的な未予定時間 (最後の予定の終わりから 360度まで)
   if (currentTimeAngle < 360) {
     graphData.push({
-      color: '#444444',
+      color: '#1c1c1c',
       value: 360 - currentTimeAngle,
-      data: { title: '未予定時間', id: `idle-end` },
+      data: {
+        title: '未予定時間',
+        id: `idle-${currentTimeAngle}`,
+        isIdle: true,
+      },
     });
   }
 
