@@ -135,7 +135,7 @@ class Model_Category extends \Orm\Model
 	{
 		// ORMを使用して全データを取得 (シンプル)
 		$categories = static::find('all', array(
-			'order_by' => array('id' => 'asc'),
+			'order_by' => array('id' => 'asc'), // 常に昇順で並び替えて返す
 		));
 
 		return static::format_categories($categories);
