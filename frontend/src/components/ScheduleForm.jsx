@@ -78,12 +78,13 @@ export const ScheduleForm = () => {
   // 編集モード/日付変更時の初期化処理
   // ------------------------------------------------------------------
   useEffect(() => {
-    // ★変更: prop ではなく Context の editingSchedule を使う
+    // 編集モードで、かつ編集対象のデータがある場合
     if (isEditMode && editingSchedule) {
-      // 編集モード時の初期化
+      // 編集モード時の初期化処理
       const start = parseTime(editingSchedule.start_time);
       const end = parseTime(editingSchedule.end_time);
 
+      // フォームに編集対象のデータをセット
       setFormData({
         title: editingSchedule.title || '',
         category_id: editingSchedule.category_id || '',
@@ -97,6 +98,7 @@ export const ScheduleForm = () => {
       });
     } else if (isAddingNew) {
       // 新規追加モード時の初期化
+      // 現在選択中の日付に基づいてフォームをリセット
       setFormData(createInitialFormState(currentDate, categories));
     }
     setFormError('');
@@ -115,13 +117,12 @@ export const ScheduleForm = () => {
     // 【新規登録時/未選択時のデフォルト値】
     const defaultTitle = '';
     const defaultNote = '';
-    const defaultColor = '#3498db'; // フォームのベースカラーに戻す
+    const defaultColor = '#FF0000'; // フォームのベースカラーに戻す
     const defaultStart = parseTime('09:00:00', '09', '00');
     const defaultEnd = parseTime('10:00:00', '10', '00');
 
-    // ★主要ロジックの修正★
+    // NULL (カテゴリーなし) が選ばれた場合: フォームをデフォルト値にリセット
     if (categoryId === '') {
-      // NULL (未選択) が選ばれた場合: フォームをリセット
       setFormData((prev) => ({
         ...prev,
         category_id: '',
@@ -136,16 +137,17 @@ export const ScheduleForm = () => {
       return;
     }
 
+    // カテゴリーが選択された場合: カテゴリのデフォルト値でフォームを更新
     setFormData((prev) => ({
       ...prev,
       category_id: categoryId,
-      // カテゴリーのデフォルト値で色と時刻を更新
+      // カテゴリーに色が設定されていれば適用、なければ現在の色を保持
       color: category?.default_color || prev.color,
-      // UI上、タイトルはユーザーが入力したものを優先することが多いため、
-      // ユーザーが入力していない場合のみデフォルトタイトルを適用する方がUXは良い。
+      // ユーザーが入力していない場合 (prev.title === '') のみ、デフォルトタイトルを適用
       title: prev.title === '' ? category?.default_title || '' : prev.title,
+      // ユーザーが入力していない場合 (prev.title === '') のみ、デフォルトタイトルを適用
       note: prev.note === '' ? category?.default_note || '' : prev.note,
-
+      // デフォルト時刻をパースして適用。なければ現在の値を保持
       start_hour: parseTime(category?.default_start).hour || prev.start_hour,
       start_minute:
         parseTime(category?.default_start).minute || prev.start_minute,
@@ -195,6 +197,7 @@ export const ScheduleForm = () => {
 
     const payload = {
       title: formData.title,
+      // カテゴリーが空文字列の場合は null を設定して送信
       category_id: formData.category_id === '' ? null : formData.category_id,
       date: simpleDate,
       start_time: start_time_api,
@@ -205,22 +208,23 @@ export const ScheduleForm = () => {
 
     let result;
     try {
-      // ★変更: 編集時は editingSchedule.id を使う
+      // 編集モードなら更新処理、新規追加モードなら追加処理を実行
       if (isEditMode) {
         result = await updateSchedule(editingSchedule.id, payload);
       } else {
+        // ペイロードを使って新規追加
         result = await addSchedule(payload);
       }
 
       if (result.success) {
-        endForm(); // ★変更: Contextの終了関数を呼び出す
+        endForm(); // 成功したらフォームを閉じる
       } else {
         setFormError(result.message || '処理に失敗しました。');
       }
     } catch (error) {
       setFormError('ネットワークエラーが発生しました。');
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // 処理終了後、送信中フラグを解除
     }
   };
 
@@ -228,21 +232,22 @@ export const ScheduleForm = () => {
   // 削除ハンドラ（編集モード時のみ）
   // ------------------------------------------------------------------
   const handleDelete = async () => {
+    // 削除確認ダイアログ
     if (!window.confirm('この予定を削除しますか？')) return;
 
-    setIsSubmitting(true);
+    setIsSubmitting(true); // 送信中フラグを立てる
     try {
-      // ★変更: editingSchedule.id を使う
+      // 編集対象のIDを使って削除処理を実行
       const result = await deleteSchedule(editingSchedule.id);
       if (result.success) {
-        endForm(); // ★変更: Contextの終了関数を呼び出す
+        endForm(); // 成功したらフォームを閉じる
       } else {
         setFormError(result.message || '削除に失敗しました。');
       }
     } catch (error) {
       setFormError('ネットワークエラーが発生しました。');
     } finally {
-      setIsSubmitting(false);
+      setIsSubmitting(false); // 処理終了後、送信中フラグを解除
     }
   };
 
