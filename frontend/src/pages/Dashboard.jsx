@@ -1,3 +1,7 @@
+/*
+ * 1dayScheduleSimulator
+ * 各コンポーネントのインポートを行い、画面構成を担当する。
+ */
 import { AuthContextProvider } from '../contexts/AuthContext';
 import { DateContextProvider } from '../contexts/DateContext';
 import { ScheduleContextProvider } from '../contexts/ScheduleContext';
