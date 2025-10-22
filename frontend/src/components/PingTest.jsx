@@ -1,3 +1,9 @@
+/*
+ * PingTest.jsx
+ *
+ * 目的：
+ * 1. バックエンドが起動しているかを確認する。
+ */
 import { useEffect, useState } from 'react';
 
 export function PingTest() {
