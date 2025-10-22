@@ -197,20 +197,20 @@ class Model_User extends \Orm\Model
     // 3. セッションCookie (fuelcid) の削除
     // ------------------------------------------------------------------
     \Cookie::delete(
-        \Config::get('session.cookie.name', 'fuelcid'), 
-        $session_config['path'] ?? '/',           
-        $session_config['domain'] ?? null,        
-        $session_config['secure'] ?? false        
+			\Config::get('session.cookie.name', 'fuelcid'), 
+			$session_config['path'] ?? '/',           
+			$session_config['domain'] ?? null,        
+			$session_config['secure'] ?? false        
     );
     
     // ------------------------------------------------------------------
     // 4. リメンバーミーCookieの削除 (SimpleAuthの設定を完全に利用)
     // ------------------------------------------------------------------
     \Cookie::delete(
-        $remember_config['cookie_name'] ?? 'remember_me', // 名前
-        $remember_config['cookie_path'] ?? '/',           // パス
-        $remember_config['cookie_domain'] ?? null,
-        $remember_config['cookie_secure'] ?? false
+			$remember_config['cookie_name'] ?? 'remember_me', // 名前
+			$remember_config['cookie_path'] ?? '/',           // パス
+			$remember_config['cookie_domain'] ?? null,
+			$remember_config['cookie_secure'] ?? false
     );
     
     // セッションデータ自体を破棄
