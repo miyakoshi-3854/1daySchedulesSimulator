@@ -16,8 +16,8 @@ class Controller_Api_User extends Controller_Base_Api
    */
   public function options_register()
   {
-  // 処理は base/api.php の before() で行われるため、
-  // ここでは空のメソッドを定義する
+    // 処理は base/api.php の before() で既に実装済みのため、
+    // ここでは FuelPHP のルーティングにヒットさせる役割のみを担う
   }
   
   /**
