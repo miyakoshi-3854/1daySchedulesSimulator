@@ -57,6 +57,10 @@ class Controller_Api_Schedule extends Controller_Base_Api
     // JSONデータ全体を取得
     $input_data = \Input::json();
 
+    // 【★修正点1★】JSONデータ全体に対して手動でサニタイズを適用
+    // これにより、Nullチェックでコアが落ちるのを回避しつつ、XSS対策を適用
+    $input_data = \Security::xss_clean($input_data);
+
     // バリデーション
     $validation = $this->validate_schedule_data($input_data); // 引数 $input_data を渡す
     if ($validation !== true) {
@@ -71,7 +75,7 @@ class Controller_Api_Schedule extends Controller_Base_Api
       'end_time'    => $input_data['end_time'],
       'color'       => $input_data['color'] ?? '#3498db',
       'note'        => $input_data['note'] ?? '',
-      'category_id' => $input_data['category_id'] ?? null,
+      'category_id' => empty($input_data['category_id']) ? null : $input_data['category_id'],
     ];
 
     // 時間重複チェック

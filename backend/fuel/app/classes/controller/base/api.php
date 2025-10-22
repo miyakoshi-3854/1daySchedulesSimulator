@@ -27,6 +27,9 @@ class Controller_Base_Api extends Controller_Rest
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
+    // クリックジャッキング対策 (iframe埋め込みを拒否)
+    header('X-Frame-Options: SAMEORIGIN');
+
     // Preflight (OPTIONS) リクエスト対応
     if (\Input::method() === 'OPTIONS') {
       return Response::forge('', 200);

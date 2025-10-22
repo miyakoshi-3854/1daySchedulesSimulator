@@ -102,8 +102,15 @@ export const ScheduleContextProvider = ({ children }) => {
 
   // 【監視】日付、認証状態の変更を監視し、スケジュールデータをリロード
   useEffect(() => {
-    // currentDate が変更されるたび、またはログイン状態が true になるたびにロード
-    loadScheduleData(currentDate);
+    if (isLoggedIn) {
+      // currentDate が変更されるたび、またはログイン状態が true になるたびにロード
+      loadScheduleData(currentDate);
+    } else {
+      // 未ログイン時、データを即座にクリア
+      setSchedules([]);
+      setHighlightDates([]);
+      setIsDataLoading(false);
+    }
   }, [currentDate, isLoggedIn, loadScheduleData]);
 
   // 【初回ロード】カテゴリーデータのロード
