@@ -5,6 +5,11 @@ use Fuel\Core\Validation;
 
 class Controller_Api_Schedule extends Controller_Base_Api
 {
+  /**
+   * OPTIONS /api/schedule
+   * CORS Preflight リクエストを処理する
+   * Controller_Rest の仕様上、明示的に定義する
+   */
   public function options_index()
   {
     // 処理は base/api.php の before() で既に実装済みのため、
@@ -31,7 +36,7 @@ class Controller_Api_Schedule extends Controller_Base_Api
       return $this->error('Missing required parameter: date or (start_date and end_date)', 400);
     }
     
-    // Model のメソッドを呼び出す (Model_Schedule の完全版が必要です)
+    // Model のメソッドを呼び出す
     $schedules = Model_Schedule::get_user_schedules(
       $user_id,
       $date,
