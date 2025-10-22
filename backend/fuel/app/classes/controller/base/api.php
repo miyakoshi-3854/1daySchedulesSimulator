@@ -13,6 +13,10 @@ class Controller_Base_Api extends Controller_Rest
   protected $require_auth = false; // 継承先でtrueにすることで認証必須
   protected $user_id = null;       // 認証済みユーザーのID
 
+  /**
+   * Controller_Base_Api
+   * このコントローラーで拡張したクラスを使用する時に、最初に実行されるメソッド
+   */
   public function before()
   {
     parent::before();
