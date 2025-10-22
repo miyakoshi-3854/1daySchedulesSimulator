@@ -1,7 +1,7 @@
 <?php
 return array(
-	'_root_'  => 'welcome/index',  // The default route
-	'_404_'   => 'welcome/404',    // The main 404 route
+	'_root_' => 'api/ping', // APIが起動しているか確認するため ping をデフォルトにする
+	'_404_'  => 'api/ping/404', // 404ルートは維持
 
 	// User関連
 	'api/register' => 'api/user/register', // ユーザー登録API
@@ -15,6 +15,4 @@ return array(
 
 	// Category関連
 	'api/categories' => 'api/category/index', // カテゴリーの取得API
-	
-	'hello(/:name)?' => array('welcome/hello', 'name' => 'hello'),
 );

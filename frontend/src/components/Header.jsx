@@ -1,3 +1,11 @@
+/*
+ * Header.jsx
+ * 日付の変更、ユーザーの新規登録、ログイン、ログアウトを担当する。
+ *
+ * 目的：
+ * 1. 選択する日付の変更を行う。
+ * 2. ユーザー関連の導線になる。
+ */
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useDate } from '../contexts/DateContext';
@@ -81,7 +89,6 @@ export const Header = () => {
   // ログアウト処理
   const handleLogout = () => {
     logout(); // AuthContextのログアウト関数を実行
-    // ログアウト後の画面遷移などはここに追加
   };
 
   return (

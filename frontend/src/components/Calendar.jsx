@@ -34,7 +34,9 @@ export const Calendar = () => {
   const calendarDays = useMemo(() => {
     const days = [];
     // 1. 月の開始日と最終日
-    const monthStartDayOfWeek = displayMonth.getDay(); // 0 (日曜日) - 6 (土曜日)
+    // displayMonthの1日の曜日を取得 (0: 日曜日, 6: 土曜日)
+    const monthStartDayOfWeek = displayMonth.getDay();
+    // 表示対象の月の日数（最終日）を取得
     const daysInMonth = new Date(
       currentDate.getFullYear(),
       currentDate.getMonth() + 1,
@@ -42,32 +44,39 @@ export const Calendar = () => {
     ).getDate();
 
     // 2. 前月の日付の補い
-    const prevMonthDaysToShow = monthStartDayOfWeek; // 1日の曜日に応じて前の月を表示する日数
+    // カレンダーの1行目を埋めるために、前月を表示する日数
+    const prevMonthDaysToShow = monthStartDayOfWeek;
+    // 前月の最終日を取得するためのDateオブジェクトを作成
     const prevMonthLastDate = new Date(displayMonth);
     prevMonthLastDate.setDate(0); // 前月の最終日
 
+    // 前月の日付を生成し、days配列に追加
     for (let i = prevMonthDaysToShow; i > 0; i--) {
       const date = new Date(prevMonthLastDate);
+      // 前月の最終日から遡って日付を設定
       date.setDate(prevMonthLastDate.getDate() - i + 1);
-      days.push({ date, isCurrentMonth: false });
+      days.push({ date, isCurrentMonth: false }); // 当月ではないため false
     }
 
     // 3. 当月の日付
+    // 1日から最終日までループ
     for (let i = 1; i <= daysInMonth; i++) {
       const date = new Date(displayMonth);
-      date.setDate(i);
-      days.push({ date, isCurrentMonth: true });
+      date.setDate(i); // 当月の日付を設定
+      days.push({ date, isCurrentMonth: true }); // 当月のため true
     }
 
     // 4. 次月の日付の補い (6行目を満たすまで)
     const totalCells = 6 * 7; // 6週間 * 7日 = 42マス
+    // 42マスから、すでに追加された日付の数を引いて、次月で補う必要がある日数を計算
     const nextMonthDaysToShow = totalCells - days.length;
 
+    // 次月の日付を生成し、days配列に追加
     for (let i = 1; i <= nextMonthDaysToShow; i++) {
       const date = new Date(displayMonth);
       date.setMonth(displayMonth.getMonth() + 1); // 次の月に移動
-      date.setDate(i);
-      days.push({ date, isCurrentMonth: false });
+      date.setDate(i); // 次月の日付を設定（1日から順に）
+      days.push({ date, isCurrentMonth: false }); // 当月ではないため false
     }
 
     return days;

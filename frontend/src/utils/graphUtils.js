@@ -1,3 +1,7 @@
+/*
+ * 時刻を角度に変換するヘルパー関数
+ */
+
 import * as d3 from 'd3';
 
 const TOTAL_MINUTES_IN_DAY = 24 * 60; // 1440分

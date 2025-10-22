@@ -1,16 +1,13 @@
-import React from 'react';
+/*
+ * confirmModal.jsx
+ * スケジュール削除時に表示されるモーダル
+ *
+ * 目的：
+ * 1. ユーザーが間違いで削除することを防ぐ
+ */
 import styles from '../styles/ConfirmModal.module.css';
 
-export const ConfirmModal = ({
-  message,
-  confirmText,
-  onConfirm,
-  onCancel,
-  isDestructive = false,
-}) => {
-  // 汎用 ConfirmModal の UI を作成します
-  const confirmButtonClass = isDestructive ? 'btn-danger' : 'btn-primary';
-
+export const ConfirmModal = ({ message, confirmText, onConfirm, onCancel }) => {
   return (
     <div
       className="modal-overlay"
