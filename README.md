@@ -32,6 +32,12 @@ docker container exec -it fuelphp-app bash
 php oil console
 ```
 
+- マイグレーション実行
+
+```
+php oil refine migrate
+```
+
 - テンプレートカテゴリーの挿入
 
 ```
